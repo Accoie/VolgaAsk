@@ -1,4 +1,3 @@
-# converter.py
 from pathlib import Path
 
 from docling.datamodel.base_models import InputFormat
