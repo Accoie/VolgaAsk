@@ -1,22 +1,15 @@
 import logging
-import sys
 from pathlib import Path
 
-if __package__:
-    from ..configs.config import ConverterConfig
-    from ..core.converter import PdfConverter
-else:
-    project_dir = Path(__file__).resolve().parents[1]
-    sys.path.insert(0, str(project_dir))
-    from configs.config import ConverterConfig
-    from core.converter import PdfConverter
+from ..configs.config import ConverterConfig
+from ..core.converter import PdfConverter
 
 logger = logging.getLogger(__name__)
 
 
 def convert_pdf_directory(input_dir: Path, output_dir: Path) -> bool:
     """
-    Пакетная конвертация директории.
+    Конвертация всех pdf-файлов в директории в md.
     Возвращает True, если все файлы успешно обработаны.
     """
     input_path = Path(input_dir)

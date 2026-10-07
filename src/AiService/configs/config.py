@@ -7,3 +7,11 @@ class ConverterConfig:
     PROJECT_ROOT = Path(__file__).resolve().parent.parent
     INPUT_DIR = PROJECT_ROOT / "data" / "raw"
     OUTPUT_DIR = PROJECT_ROOT / "data" / "processed"
+
+class ChunkerConfig:
+    """Конфигурация чанкера."""
+
+    PROJECT_ROOT = Path(__file__).resolve().parent.parent
+
+    INPUT_DIR = PROJECT_ROOT / "data" / "processed"
+    OUTPUT_DIR = PROJECT_ROOT / "data" / "chunks"
