@@ -25,30 +25,12 @@ class Chunker:
     def __init__(self, min_chunk_length: int = 50) -> None:
         self.min_chunk_length: int = min_chunk_length
 
-    def chunk_all(self, input_dir: Path, output_dir: Path) -> bool:
-        """Обработать все .md из input_dir в output_dir файлами в формате json"""
-        md_files: list[Path] = sorted(input_dir.glob("*.md"))
-        if not md_files:
-            return False
-
-        output_dir.mkdir(parents=True, exist_ok=True)
-        failed: bool = False
-
-        for md_file in md_files:
-            try:
-                self.chunk(md_file, output_dir)
-            except Exception as error:
-                print(f"[ERROR] {md_file.name}: {error}")
-                failed = True
-
-        return not failed
-
     def chunk(self, md_file: Path, output_dir: Path) -> Path:
-        """Разбивает один .md на чанки. и возвращает файл в формате json"""
+        """Разбивает один .md на чанки и возвращает файл в формате json."""
         document_id: str = md_file.stem
         document_date: str | None = DateParser.extract_document_date(md_file)
         chunks: list[dict] = list(
-            self._iter_chunks(md_file, document_id, document_date)
+            self._split_into_chunks(md_file, document_id, document_date)
         )
 
         output_file: Path = output_dir / f"{document_id}.json"
@@ -58,7 +40,7 @@ class Chunker:
         )
         return output_file
 
-    def _iter_chunks(
+    def _split_into_chunks(
         self,
         md_file: Path,
         document_id: str,
@@ -103,7 +85,7 @@ class Chunker:
         return bool(SECTION_PATTERN.match(line))
 
     def _is_article_start(self, line: str) -> bool:
-        """Проверяет является ли строка началом пункта"""
+        """Проверяет является ли строка началом пункта."""
         return bool(ARTICLE_PATTERN.match(line))
 
     def _update_headings(self, state: ChunkState, line: str) -> None:
@@ -120,7 +102,6 @@ class Chunker:
             state.heading3 = None
         else:
             state.heading3 = title
-
 
     def _build_chunk(
         self,
