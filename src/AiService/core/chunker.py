@@ -30,7 +30,7 @@ class Chunker:
         document_id: str = md_file.stem
         document_date: str | None = DateParser.extract_document_date(md_file)
         chunks: list[dict] = list(
-            self._split_into_chunks(md_file, document_id, document_date)
+            self._extract_chunk(md_file, document_id, document_date)
         )
 
         output_file: Path = output_dir / f"{document_id}.json"
@@ -40,7 +40,7 @@ class Chunker:
         )
         return output_file
 
-    def _split_into_chunks(
+    def _extract_chunk(
         self,
         md_file: Path,
         document_id: str,
