@@ -6,3 +6,5 @@ __pycache__/
 
 data/processed/
 data/chunks/
+data/embeddings/
+data/models/
