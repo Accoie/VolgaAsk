@@ -1,0 +1,49 @@
+import logging
+from pathlib import Path
+
+from sqlalchemy import create_engine
+from sqlalchemy.engine import Engine
+
+from ..configs.config import DatabaseConfig, EmbeddingConfig
+from ..database.indexer import Indexer
+
+
+logger = logging.getLogger(__name__)
+
+
+def index_directory(input_dir: Path, engine: Engine) -> bool:
+    chunk_files: list[Path] = sorted(input_dir.glob("*.json"))
+    if not chunk_files:
+        logger.error("No embedding files found in %s", input_dir)
+        return False
+
+    indexer = Indexer(engine)
+    try:
+        indexer.ensure_schema()
+    except Exception as error:
+        logger.error("Failed to create database schema: %s", error)
+        return False
+
+    failed = False
+    for chunk_file in chunk_files:
+        try:
+            count = indexer.load_file(chunk_file)
+            logger.info("Indexed %s chunks from %s", count, chunk_file.name)
+        except Exception as error:
+            logger.error("%s: %s", chunk_file.name, error)
+            failed = True
+
+    return not failed
+
+
+def main() -> int:
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+    engine = create_engine(DatabaseConfig.DATABASE_URL)
+    try:
+        return 0 if index_directory(EmbeddingConfig.OUTPUT_DIR, engine) else 1
+    finally:
+        engine.dispose()
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

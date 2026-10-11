@@ -1,0 +1,15 @@
+services:
+  pgvector:
+    image: pgvector/pgvector:pg17
+    container_name: ai-service-pgvector
+    environment:
+      POSTGRES_USER: ai_service
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: ai_service
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgvector_data:/var/lib/postgresql/data
+
+volumes:
+  pgvector_data:
