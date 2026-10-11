@@ -3,13 +3,14 @@ from pathlib import Path
 
 from ..configs.config import ConverterConfig
 from ..processing.converter import PdfConverter
+from ..utils.text_sanitizer import TextSanitizer
 
 logger = logging.getLogger(__name__)
 
 
 def convert_pdf_directory(input_dir: Path, output_dir: Path) -> bool:
     """
-    Конвертация всех pdf-файлов в директории в md.
+    Конвертация всех pdf-файлов в директории в md с последующей очисткой.
     Возвращает True, если все файлы успешно обработаны.
     """
     input_path = Path(input_dir)
@@ -22,12 +23,18 @@ def convert_pdf_directory(input_dir: Path, output_dir: Path) -> bool:
         return False
 
     output_path.mkdir(parents=True, exist_ok=True)
+    
     converter = PdfConverter()
+    sanitizer = TextSanitizer()
     failed = False
 
     for pdf_file in pdf_files:
         try:
             converter.convert(pdf_file, output_path)
+            
+            expected_md_file = output_path / f"{pdf_file.stem}.md"
+            sanitizer.sanitize_file(expected_md_file)
+                
         except Exception as error:
             logger.error("%s: %s", pdf_file.name, error)
             failed = True
