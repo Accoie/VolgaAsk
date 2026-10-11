@@ -6,9 +6,11 @@ from typing import Iterator
 
 from ..utils.date_parser import DateParser
 
-
 SECTION_PATTERN: re.Pattern[str] = re.compile(r'^(#{2,3})\s+(.+)$')
-ARTICLE_PATTERN: re.Pattern[str] = re.compile(r'^-?\s*(\d+\.\d+)\.')
+
+# "1. ", "3.6. ", "- 1.2. ", "4.20. " 
+# Не является артиклем "1)", "2) ", "1.7 ", или номера среди предложения.
+ARTICLE_PATTERN: re.Pattern[str] = re.compile(r'^(?:-\s*)?(\d+(?:\.\d+)*)\.(?:\s+|$)')
 
 
 @dataclass
@@ -51,32 +53,34 @@ class Chunker:
 
         with md_file.open(encoding="utf-8") as f:
             for line in f:
-                line: str = line.rstrip('\n')
+                line_str: str = line.rstrip('\n')
 
-                is_section: bool = self._is_section(line)
-                is_article: bool = self._is_article_start(line)
+                trimmed_line: str = line_str.strip()
+
+                is_section: bool = self._is_section(line_str)
+                is_article: bool = self._is_article_start(trimmed_line)
 
                 if is_section or is_article:
                     chunk: dict | None = self._build_chunk(
                         state, document_id, document_date, chunk_index
                     )
-                    state.text = []
-
+                    
                     if chunk:
                         yield chunk
                         chunk_index += 1
+                        state.text = []
+                    elif is_section:
+                        state.text = []
 
                     if is_section:
-                        self._update_headings(state, line)
+                        self._update_headings(state, line_str)
                         continue
 
-                state.text.append(line)
+                state.text.append(line_str)
 
         chunk: dict | None = self._build_chunk(
             state, document_id, document_date, chunk_index
         )
-        state.text = []
-
         if chunk:
             yield chunk
 
@@ -85,7 +89,7 @@ class Chunker:
         return bool(SECTION_PATTERN.match(line))
 
     def _is_article_start(self, line: str) -> bool:
-        """Проверяет является ли строка началом пункта."""
+        """Проверяет является ли строка началом подлинного пункта/статьи."""
         return bool(ARTICLE_PATTERN.match(line))
 
     def _update_headings(self, state: ChunkState, line: str) -> None:
@@ -138,9 +142,9 @@ class Chunker:
         }
 
     def _extract_article(self, text: str) -> str | None:
-        """Извлечь номер пункта из начала текста."""
-        text = re.sub(r'^-\s+', '', text)
-        match: re.Match[str] | None = ARTICLE_PATTERN.match(text)
+        """Извлечь точный номер пункта из начала текста чанка."""
+        first_line = text.split('\n')[0].strip()
+        match: re.Match[str] | None = ARTICLE_PATTERN.match(first_line)
         return match.group(1) if match else None
 
     def _merge_headings(self, state: ChunkState) -> str | None:
