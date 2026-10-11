@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 
 from ..configs.config import ConverterConfig
-from ..core.converter import PdfConverter
+from ..processing.converter import PdfConverter
 
 logger = logging.getLogger(__name__)
 

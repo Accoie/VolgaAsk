@@ -1,7 +1,7 @@
 import logging
 from pathlib import Path
 
-from ..core.chunker import Chunker
+from ..processing.chunker import Chunker
 from ..configs.config import ChunkerConfig
 
 
