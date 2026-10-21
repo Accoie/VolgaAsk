@@ -17,7 +17,7 @@ class ChunkerConfig:
     INPUT_DIR = PROJECT_ROOT / "data" / "processed"
     OUTPUT_DIR = PROJECT_ROOT / "data" / "chunks"
 
-class EmbeddingConfig:
+class ModelConfig:
     PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
     MODEL_NAME = "sergeyzh/rubert-tiny-sts-v2"

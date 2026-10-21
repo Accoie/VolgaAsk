@@ -4,12 +4,20 @@ from pathlib import Path
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 
-from ..configs.config import DatabaseConfig, EmbeddingConfig
+from ..configs.config import DatabaseConfig, ModelConfig
 from ..database.indexer import Indexer
 
 
 logger = logging.getLogger(__name__)
 
+
+def main() -> int:
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+    engine = create_engine(DatabaseConfig.DATABASE_URL)
+    try:
+        return 0 if index_directory(ModelConfig.OUTPUT_DIR, engine) else 1
+    finally:
+        engine.dispose()
 
 def index_directory(input_dir: Path, engine: Engine) -> bool:
     chunk_files: list[Path] = sorted(input_dir.glob("*.json"))
@@ -34,16 +42,6 @@ def index_directory(input_dir: Path, engine: Engine) -> bool:
             failed = True
 
     return not failed
-
-
-def main() -> int:
-    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
-    engine = create_engine(DatabaseConfig.DATABASE_URL)
-    try:
-        return 0 if index_directory(EmbeddingConfig.OUTPUT_DIR, engine) else 1
-    finally:
-        engine.dispose()
-
 
 if __name__ == "__main__":
     raise SystemExit(main())

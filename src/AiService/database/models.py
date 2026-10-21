@@ -13,6 +13,7 @@ class Chunk(Base):
     document_id: Mapped[str] = mapped_column()
     document_date: Mapped[str | None] = mapped_column()
     article: Mapped[str | None] = mapped_column()
+    amendant: Mapped[bool] = mapped_column()
     heading: Mapped[str | None] = mapped_column()
     chunk_index: Mapped[int] = mapped_column()
     text: Mapped[str] = mapped_column()

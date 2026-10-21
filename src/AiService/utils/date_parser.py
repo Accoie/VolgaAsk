@@ -2,7 +2,7 @@ import re
 from pathlib import Path
 
 
-HEAD_SIZE = 3000
+HEAD_SIZE = 2000
 
 DATE_PATTERNS = [
     r'от\s+(\d{1,2}\s+[а-яё]+\s+\d{4})',
@@ -18,45 +18,19 @@ MONTHS = {
 
 
 class DateParser:
-    """Извлекает дату документа из имени файла или текста."""
+    """Извлекает дату документа из текста."""
 
     @staticmethod
-    def extract_document_date(md_file: Path) -> str | None:
-        """Приоритет: имя файла -> текст -> None."""
-        date_from_name = DateParser.from_filename(md_file.name)
-        if date_from_name:
-            return date_from_name
-
-        return DateParser.from_file(md_file)
-
-    @staticmethod
-    def from_filename(filename: str) -> str | None:
-        """Дата из имени файла."""
-        match = re.match(r'^(\d{2})(\d{2})(\d{2})-', filename)
+    def parse_data_from_text(text: str) -> str | None:
+        """Дата из текста"""
+        match = re.match(r'^(\d{2})(\d{2})(\d{2})-', text)
         if match:
             return f"20{match.group(1)}-{match.group(2)}-{match.group(3)}"
 
-        match = re.search(r'(\d{4})', filename)
+        match = re.search(r'(\d{4})', text)
         if match:
             return f"{match.group(1)}-01-01"
 
-        return None
-
-    @staticmethod
-    def from_file(md_file: Path) -> str | None:
-        """Дата из первых N символов файла."""
-        with md_file.open(encoding="utf-8") as f:
-            head = f.read(HEAD_SIZE)
-
-        return DateParser.from_text(head)
-
-    @staticmethod
-    def from_text(text: str) -> str | None:
-        """Дата из текста."""
-        for pattern in DATE_PATTERNS:
-            match = re.search(pattern, text, re.IGNORECASE)
-            if match:
-                return DateParser._parse_russian_date(match.group(1))
         return None
 
     @staticmethod
