@@ -32,22 +32,3 @@ class DateParser:
             return f"{match.group(1)}-01-01"
 
         return None
-
-    @staticmethod
-    def _parse_russian_date(raw: str) -> str | None:
-        """«11 марта 2020» -> 2020-03-11."""
-        raw = raw.strip()
-
-        match = re.match(r'(\d{1,2})\s+([а-яё]+)\s+(\d{4})', raw, re.IGNORECASE)
-        if match:
-            day = match.group(1).zfill(2)
-            month = MONTHS.get(match.group(2).lower())
-            year = match.group(3)
-            if month:
-                return f"{year}-{month}-{day}"
-
-        match = re.match(r'(\d{2})\.(\d{2})\.(\d{4})', raw)
-        if match:
-            return f"{match.group(3)}-{match.group(2)}-{match.group(1)}"
-
-        return None
