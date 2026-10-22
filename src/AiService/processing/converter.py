@@ -10,7 +10,7 @@ from docling_core.types.doc.document import DoclingDocument
 logger = logging.getLogger(__name__)
 
 
-class DoclingConverter:
+class Converter:
     """Конвертирует PDF документы в DoclingDocument."""
 
     SUPPORTED_EXTENSIONS = frozenset([".pdf"])

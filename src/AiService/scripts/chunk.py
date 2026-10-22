@@ -3,18 +3,18 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from ..configs.config import ChunkerConfig, ConverterConfig, ModelConfig
-from ..processing.chunker import DoclingChunker
-from ..processing.converter import DoclingConverter
+from ..configs.config import ChunkerConfig, ConverterConfig
+from ..processing.chunker import Chunker
+from ..processing.converter import Converter
 from ..utils.date_parser import DateParser
 
 logger = logging.getLogger(__name__)
 
 MAX_TOKENS = 256
 
-
 def main() -> int:
     """Точка входа в скрипт разбиения документов на чанки."""
+
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
     if not chunk_directory(ConverterConfig.INPUT_DIR, ChunkerConfig.OUTPUT_DIR):
@@ -34,8 +34,8 @@ def chunk_directory(input_dir: Path, output_dir: Path) -> bool:
         return False
 
     output_dir.mkdir(parents=True, exist_ok=True)
-    converter = DoclingConverter()
-    chunker = DoclingChunker(ModelConfig.MODEL_NAME, MAX_TOKENS)
+    converter = Converter()
+    chunker = Chunker(ChunkerConfig.TOKENIZER_NAME, MAX_TOKENS)
 
     failed = False
     for input_file in input_files:
@@ -52,8 +52,8 @@ def chunk_directory(input_dir: Path, output_dir: Path) -> bool:
 
 def chunk_file(
     input_file: Path, 
-    converter: DoclingConverter, 
-    chunker: DoclingChunker
+    converter: Converter, 
+    chunker: Chunker
 ) -> list[dict[str, Any]]:
     """Сконвертировать файл в документ, разбить на чанки и обогатить их датой."""
     doc = converter.convert(input_file)

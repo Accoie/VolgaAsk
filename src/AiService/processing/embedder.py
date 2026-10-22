@@ -3,7 +3,7 @@ from pathlib import Path
 from sentence_transformers import SentenceTransformer
 
 from .model_loader import ModelLoader
-
+from ..configs.config import EmbedderConfig
 
 class Embedder:
 
@@ -13,11 +13,9 @@ class Embedder:
 
     @classmethod
     def create_from_path(
-        cls,
-        local_path: str,
-        hf_name: str,
+        cls
     ) -> "Embedder":
-        model = ModelLoader.load_embedding_model(Path(local_path), hf_name)
+        model = ModelLoader.load_embedding_model(EmbedderConfig.EMBEDDER_NAME)
         return cls(model)
 
 

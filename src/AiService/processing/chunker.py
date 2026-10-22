@@ -15,7 +15,7 @@ AMEDMENT_MARKERS: list[re.Pattern[str]] = [
     re.compile(r"внесени\w*\s+изменени\w*", re.IGNORECASE),
 ]
 
-class DoclingChunker:
+class Chunker:
     """Разбивает DoclingDocument на чанки."""
 
     HEAD_LENGTH: int = 2000
@@ -26,7 +26,7 @@ class DoclingChunker:
         model_name: str,
         max_tokens: int = 256,
     ) -> None:
-        tokenizer = ModelLoader.load_tokenizer(ModelConfig.MODEL_PATH, model_name, max_tokens)
+        tokenizer = ModelLoader.load_tokenizer(model_name, max_tokens)
         self.chunker = HybridChunker(tokenizer=tokenizer, merge_peers=True)
 
 

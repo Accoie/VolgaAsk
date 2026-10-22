@@ -4,7 +4,7 @@ from pathlib import Path
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 
-from ..configs.config import DatabaseConfig, ModelConfig
+from ..configs.config import DatabaseConfig, EmbedderConfig
 from ..database.indexer import Indexer
 
 
@@ -15,7 +15,7 @@ def main() -> int:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
     engine = create_engine(DatabaseConfig.DATABASE_URL)
     try:
-        return 0 if index_directory(ModelConfig.OUTPUT_DIR, engine) else 1
+        return 0 if index_directory(EmbedderConfig.OUTPUT_DIR, engine) else 1
     finally:
         engine.dispose()
 
