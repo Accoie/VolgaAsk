@@ -19,19 +19,37 @@ def main() -> int:
     finally:
         engine.dispose()
 
+
 def index_directory(input_dir: Path, engine: Engine) -> bool:
+    chunk_files = get_chunk_files(input_dir)
+    if not chunk_files:
+        return False
+
+    indexer = initialize_indexer(engine)
+    if not indexer:
+        return False
+
+    return process_chunk_files(indexer, chunk_files)
+
+
+def get_chunk_files(input_dir: Path) -> list[Path]:
     chunk_files: list[Path] = sorted(input_dir.glob("*.json"))
     if not chunk_files:
         logger.error("No embedding files found in %s", input_dir)
-        return False
+    return chunk_files
 
+
+def initialize_indexer(engine: Engine) -> Indexer | None:
     indexer = Indexer(engine)
     try:
         indexer.ensure_schema()
+        return indexer
     except Exception as error:
         logger.error("Failed to create database schema: %s", error)
-        return False
+        return None
 
+
+def process_chunk_files(indexer: Indexer, chunk_files: list[Path]) -> bool:
     failed = False
     for chunk_file in chunk_files:
         try:
@@ -40,8 +58,8 @@ def index_directory(input_dir: Path, engine: Engine) -> bool:
         except Exception as error:
             logger.error("%s: %s", chunk_file.name, error)
             failed = True
-
     return not failed
+
 
 if __name__ == "__main__":
     raise SystemExit(main())
