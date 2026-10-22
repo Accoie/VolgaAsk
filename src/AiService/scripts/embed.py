@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any
 
 from ..configs.config import EmbedderConfig
+from ..processing.model_loader import ModelLoader
 from ..processing.embedder import Embedder
 
 logger = logging.getLogger(__name__)
@@ -30,7 +31,8 @@ def embed_all(input_dir: Path, output_dir: Path) -> bool:
 
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    embedder = Embedder.create_from_path()
+    embedding_model = ModelLoader.load_embedding_model(EmbedderConfig.EMBEDDER_NAME)
+    embedder = Embedder(embedding_model)
 
     failed = False
     for chunk_file in chunk_files:

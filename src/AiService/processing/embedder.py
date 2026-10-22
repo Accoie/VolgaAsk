@@ -11,14 +11,6 @@ class Embedder:
         self.model: SentenceTransformer = model
 
 
-    @classmethod
-    def create_from_path(
-        cls
-    ) -> "Embedder":
-        model = ModelLoader.load_embedding_model(EmbedderConfig.EMBEDDER_NAME)
-        return cls(model)
-
-
     def embed_text(self, text: str) -> list[float]:
         return [float(v) for v in self.model.encode(text)]
 
