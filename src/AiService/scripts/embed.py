@@ -52,7 +52,6 @@ def process_and_embed_file(chunk_file: Path, embedder: Embedder) -> list[dict[st
     """Прочитать чанки из файла, сгенерировать эмбеддинги и добавить их в метаданные."""
     chunks: list[dict[str, Any]] = json.loads(chunk_file.read_text(encoding="utf-8"))
     
-    # Собираем батч текстов и векторизуем
     texts = [chunk["text"] for chunk in chunks]
     vectors = embedder.embed_batch(texts)
     
