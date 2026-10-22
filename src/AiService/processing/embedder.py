@@ -2,9 +2,6 @@ from pathlib import Path
 
 from sentence_transformers import SentenceTransformer
 
-from .model_loader import ModelLoader
-from ..configs.config import EmbedderConfig
-
 class Embedder:
 
     def __init__(self, model: SentenceTransformer) -> None:

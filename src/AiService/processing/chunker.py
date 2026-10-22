@@ -5,8 +5,7 @@ from docling_core.transforms.chunker.doc_chunk import DocChunk
 from docling_core.transforms.chunker.hybrid_chunker import HybridChunker
 from docling_core.types.doc.document import DoclingDocument
 
-from .model_loader import ModelLoader
-from ..configs.config import ModelConfig
+from ..utils.model_loader import ModelLoader
 
 logger = logging.getLogger(__name__)
 

@@ -18,10 +18,10 @@ def main() -> int:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
     if not chunk_directory(ConverterConfig.INPUT_DIR, ChunkerConfig.OUTPUT_DIR):
-        logger.error("Docling chunking process failed")
+        logger.error("Chunking process failed")
         return 1
 
-    logger.info("Docling chunking process completed successfully")
+    logger.info("Chunking process completed successfully")
     return 0
 
 

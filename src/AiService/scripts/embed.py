@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any
 
 from ..configs.config import EmbedderConfig
-from ..processing.model_loader import ModelLoader
+from ..utils.model_loader import ModelLoader
 from ..processing.embedder import Embedder
 
 logger = logging.getLogger(__name__)
