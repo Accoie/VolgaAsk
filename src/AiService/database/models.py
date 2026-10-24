@@ -23,3 +23,15 @@ class Chunk(Base):
 
     text: Mapped[str] = mapped_column()
     embedding: Mapped[list[float]] = mapped_column(Vector(312))
+
+    def to_dict(self) -> dict[str, object]:
+        """Преобразовать ORM-объект в словарь для вывода."""
+        return {
+            "document_id": self.document_id,
+            "document_date": self.document_date,
+            "chunk_index": self.chunk_index,
+            "amendant": self.amendant,
+            "headings": self.headings,
+            "page_numbers": self.page_numbers,
+            "text": self.text,
+        }

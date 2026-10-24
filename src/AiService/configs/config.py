@@ -5,20 +5,20 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 
-class ConverterConfig:
-    INPUT_DIR = PROJECT_ROOT / "data" / "raw"
+class PathsConfig:
+    """Все пути к данным проекта."""
+    RAW = PROJECT_ROOT / "data" / "raw"
+    CHUNKS = PROJECT_ROOT / "data" / "chunks"
+    EMBEDDINGS = PROJECT_ROOT / "data" / "embeddings"
+    MODELS = PROJECT_ROOT / "data" / "models"
 
-class ChunkerConfig:
-    OUTPUT_DIR = PROJECT_ROOT / "data" / "chunks"
-    TOKENIZER_NAME = "sergeyzh/rubert-tiny-sts-v2"
 
-class ModelConfig:
-    MODELS_DIR = PROJECT_ROOT / "data" / "models"
+class ModelsConfig:
+    """Все имена моделей."""
+    EMBEDDER = "sergeyzh/rubert-tiny-sts-v2"
+    TOKENIZER = "sergeyzh/rubert-tiny-sts-v2"
+    RERANKER = "sshalimov04/ru-reranker-edge-150m"
 
-class EmbedderConfig:
-    EMBEDDER_NAME = "sergeyzh/rubert-tiny-sts-v2"
-    INPUT_DIR = PROJECT_ROOT / "data" / "chunks"
-    OUTPUT_DIR = PROJECT_ROOT / "data" / "embeddings"
 
 class DatabaseConfig:
     DATABASE_URL = os.getenv(

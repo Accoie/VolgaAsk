@@ -3,7 +3,7 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from ..configs.config import EmbedderConfig
+from ..configs.config import ModelsConfig, PathsConfig
 from ..utils.model_loader import ModelLoader
 from ..processing.embedder import Embedder
 
@@ -14,7 +14,7 @@ def main() -> int:
     """Точка входа в скрипт генерации эмбеддингов для чанков."""
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
-    if not embed_all(EmbedderConfig.INPUT_DIR, EmbedderConfig.OUTPUT_DIR):
+    if not embed_all(PathsConfig.CHUNKS, PathsConfig.EMBEDDINGS):
         logger.error("Embedding process failed")
         return 1
 
@@ -31,7 +31,7 @@ def embed_all(input_dir: Path, output_dir: Path) -> bool:
 
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    embedding_model = ModelLoader.load_embedding_model(EmbedderConfig.EMBEDDER_NAME)
+    embedding_model = ModelLoader.load_embedding_model(ModelsConfig.EMBEDDER)
     embedder = Embedder(embedding_model)
 
     failed = False
