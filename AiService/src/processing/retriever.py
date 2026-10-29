@@ -4,9 +4,9 @@ from sqlalchemy import select
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
-from ..database.models import Chunk
-from ..processing.embedder import Embedder
-from ..utils.model_loader import ModelLoader
+from database.models import Chunk
+from processing.embedder import Embedder
+from utils.model_loader import ModelLoader
 
 
 logger = logging.getLogger(__name__)

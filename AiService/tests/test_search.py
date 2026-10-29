@@ -5,9 +5,9 @@ from pathlib import Path
 import pytest
 from sqlalchemy.engine import Engine
 
-from AiService.configs.config import ModelsConfig
-from AiService.database.session import create_db_engine
-from AiService.processing.retriever import Retriever
+from configs.config import ModelsConfig
+from database.session import create_db_engine
+from processing.retriever import Retriever
 
 QUESTIONS_PATH = Path(__file__).parent / "data" / "questions.json"
 TOP_K = 5

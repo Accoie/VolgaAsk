@@ -3,10 +3,10 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from ..configs.config import ChunkerConfig, ConverterConfig
-from ..processing.chunker import Chunker
-from ..processing.converter import Converter
-from ..utils.date_parser import DateParser
+from configs.config import ModelsConfig, PathsConfig
+from processing.chunker import Chunker
+from processing.converter import Converter
+from utils.date_parser import DateParser
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +17,7 @@ def main() -> int:
 
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
-    if not chunk_directory(ConverterConfig.INPUT_DIR, ChunkerConfig.OUTPUT_DIR):
+    if not chunk_directory(PathsConfig.RAW, PathsConfig.CHUNKS):
         logger.error("Chunking process failed")
         return 1
 
@@ -35,7 +35,7 @@ def chunk_directory(input_dir: Path, output_dir: Path) -> bool:
 
     output_dir.mkdir(parents=True, exist_ok=True)
     converter = Converter()
-    chunker = Chunker(ChunkerConfig.TOKENIZER_NAME, MAX_TOKENS)
+    chunker = Chunker(ModelsConfig.TOKENIZER, MAX_TOKENS)
 
     failed = False
     for input_file in input_files:

@@ -3,9 +3,9 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from ..configs.config import ModelsConfig, PathsConfig
-from ..utils.model_loader import ModelLoader
-from ..processing.embedder import Embedder
+from configs.config import ModelsConfig, PathsConfig
+from utils.model_loader import ModelLoader
+from processing.embedder import Embedder
 
 logger = logging.getLogger(__name__)
 

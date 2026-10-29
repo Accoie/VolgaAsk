@@ -12,7 +12,7 @@ VolgaAsk/
 ├── ROADMAP.md
 ├── docs/                 # документация проекта
 └── AiService/            # RAG-модуль
-    ├── src/AiService/    # пакет: конвертация, чанкинг, эмбеддинги, поиск
+    ├── src/              # пакет: конвертация, чанкинг, эмбеддинги, поиск
     ├── tests/            # pytest-тесты поиска по корпусу
     ├── data/             # исходные PDF, чанки, эмбеддинги, локальные модели
     ├── docker-compose.yml
@@ -30,7 +30,7 @@ VolgaAsk/
 
 ### `AiService/`
 
-#### `src/AiService/`
+#### `src/`
 
 | Папка | За что отвечает |
 |-------|-----------------|
@@ -62,10 +62,10 @@ docker compose up -d
 .venv/Scripts/python -m pip install -e . --no-deps
 
 # 3. Обработка и индексация корпуса (если ещё не сделано)
-.venv/Scripts/python -m AiService.scripts.index
+.venv/Scripts/python -m scripts.index
 
 # 4. Поиск
-.venv/Scripts/python -m AiService.scripts.search "Кто избирает ректора?" --top-k 5
+.venv/Scripts/python -m scripts.search "Кто избирает ректора?" --top-k 5
 
 # 5. Тесты
 .venv/Scripts/python -m pytest -v
@@ -73,6 +73,6 @@ docker compose up -d
 
 На Linux/macOS путь к интерпретатору — `.venv/bin/python`.
 
-Engine создаётся в `AiService/database/session.py` (`create_db_engine()`): адрес берётся из `DATABASE_URL`, подключение ограничено `CONNECT_TIMEOUT_SECONDS`. Если векторная БД выключена, `Retriever` открывает соединение до загрузки моделей и сразу падает с `OperationalError`, а не висит на неопределённый таймаут; `search.py` в этом случае печатает подсказку `docker compose up -d`.
+Engine создаётся в `src/database/session.py` (`create_db_engine()`): адрес берётся из `DATABASE_URL`, подключение ограничено `CONNECT_TIMEOUT_SECONDS`. Если векторная БД выключена, `Retriever` открывает соединение до загрузки моделей и сразу падает с `OperationalError`, а не висит на неопределённый таймаут; `search.py` в этом случае печатает подсказку `docker compose up -d`.
 
-Тесты не требуют установки пакета: путь `src` pytest добавляет сам (настройка `pythonpath` в `pyproject.toml`). Установка из шага 2 нужна, чтобы скрипты запускались как `python -m AiService.scripts.*`.
+Тесты не требуют установки пакета: путь `src` pytest добавляет сам (настройка `pythonpath` в `pyproject.toml`). Установка из шага 2 нужна, чтобы скрипты запускались как `python -m scripts.*`.

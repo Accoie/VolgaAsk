@@ -6,7 +6,7 @@ from docling_core.transforms.chunker.tokenizer.huggingface import HuggingFaceTok
 from sentence_transformers import CrossEncoder, SentenceTransformer
 from transformers import AutoTokenizer
 
-from ..configs.config import PathsConfig
+from configs.config import PathsConfig
 
 
 logger = logging.getLogger(__name__)

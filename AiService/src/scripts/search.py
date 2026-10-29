@@ -5,9 +5,9 @@ import logging
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import OperationalError
 
-from ..configs.config import ModelsConfig
-from ..database.session import create_db_engine
-from ..processing.retriever import Retriever
+from configs.config import ModelsConfig
+from database.session import create_db_engine
+from processing.retriever import Retriever
 
 
 logger = logging.getLogger(__name__)

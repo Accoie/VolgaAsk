@@ -3,9 +3,9 @@ from pathlib import Path
 
 from sqlalchemy.engine import Engine
 
-from ..configs.config import PathsConfig
-from ..database.indexer import Indexer
-from ..database.session import create_db_engine
+from configs.config import PathsConfig
+from database.indexer import Indexer
+from database.session import create_db_engine
 
 
 logger = logging.getLogger(__name__)
