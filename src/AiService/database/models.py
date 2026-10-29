@@ -22,7 +22,7 @@ class Chunk(Base):
     page_numbers: Mapped[list[int]] = mapped_column(ARRAY(Integer), default=list)
 
     text: Mapped[str] = mapped_column()
-    embedding: Mapped[list[float]] = mapped_column(Vector(312))
+    embedding: Mapped[list[float]] = mapped_column(Vector(768))
 
     def to_dict(self) -> dict[str, object]:
         """Преобразовать ORM-объект в словарь для вывода."""

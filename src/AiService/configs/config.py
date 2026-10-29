@@ -15,7 +15,7 @@ class PathsConfig:
 
 class ModelsConfig:
     """Все имена моделей."""
-    EMBEDDER = "sergeyzh/rubert-tiny-sts-v2"
+    EMBEDDER = "deepvk/USER2-base"
     TOKENIZER = "sergeyzh/rubert-tiny-sts-v2"
     RERANKER = "sshalimov04/ru-reranker-edge-150m"
 
