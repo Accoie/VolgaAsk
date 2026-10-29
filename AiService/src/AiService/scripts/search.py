@@ -2,10 +2,11 @@ import argparse
 import json
 import logging
 
-from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
+from sqlalchemy.exc import OperationalError
 
-from ..configs.config import DatabaseConfig, ModelsConfig
+from ..configs.config import ModelsConfig
+from ..database.session import create_db_engine
 from ..processing.retriever import Retriever
 
 
@@ -38,10 +39,13 @@ def main() -> int:
     args = _parse_args()
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
-    engine = create_engine(DatabaseConfig.DATABASE_URL)
+    engine = create_db_engine()
 
     try:
         results = _search(engine, args.query, args.top_k)
+    except OperationalError as error:
+        logger.error("PostgreSQL недоступен: %s", error.orig)
+        return 1
     except Exception as error:
         logger.error("Search failed: %s", error)
         return 1

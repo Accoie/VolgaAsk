@@ -1,8 +1,13 @@
 .vscode/
+.venv/
 
 __pycache__/
 *.py[cod]
 *$py.class
+
+.pytest_cache/
+*.egg-info/
+build/
 
 data/processed/
 data/chunks/

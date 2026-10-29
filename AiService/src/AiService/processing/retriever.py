@@ -24,6 +24,8 @@ class Retriever:
         reranker_model_name: str,
     ) -> None:
         self.engine = engine
+        with engine.connect():
+            pass
         self.embedder = Embedder(ModelLoader.load_embedding_model(embedder_model_name))
         self.reranker = ModelLoader.load_cross_encoder(reranker_model_name)
 

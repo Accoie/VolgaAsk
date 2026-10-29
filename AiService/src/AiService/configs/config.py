@@ -1,8 +1,7 @@
-import os
 from pathlib import Path
 
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
 
 
 class PathsConfig:
@@ -18,10 +17,3 @@ class ModelsConfig:
     EMBEDDER = "deepvk/USER2-base"
     TOKENIZER = "sergeyzh/rubert-tiny-sts-v2"
     RERANKER = "sshalimov04/ru-reranker-edge-150m"
-
-
-class DatabaseConfig:
-    DATABASE_URL = os.getenv(
-        "DATABASE_URL",
-        "postgresql+psycopg://ai_service:secret@localhost:5432/ai_service",
-    )

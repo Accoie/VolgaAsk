@@ -1,11 +1,11 @@
 import logging
 from pathlib import Path
 
-from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 
-from ..configs.config import DatabaseConfig, PathsConfig
+from ..configs.config import PathsConfig
 from ..database.indexer import Indexer
+from ..database.session import create_db_engine
 
 
 logger = logging.getLogger(__name__)
@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 def main() -> int:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
-    engine = create_engine(DatabaseConfig.DATABASE_URL)
+    engine = create_db_engine()
     try:
         return 0 if index_directory(PathsConfig.EMBEDDINGS, engine) else 1
     finally:
