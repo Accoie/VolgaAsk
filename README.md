@@ -8,9 +8,16 @@ RAG-помощник по нормативным документам Волга
 
 ```
 VolgaAsk/
-├── docs/          # документация проекта
-└── src/           # исходный код
-    └── AiService/ # RAG-сервис
+├── README.md
+├── ROADMAP.md
+├── docs/                 # документация проекта
+└── AiService/            # RAG-модуль
+    ├── src/AiService/    # пакет: конвертация, чанкинг, эмбеддинги, поиск
+    ├── tests/            # pytest-тесты поиска по корпусу
+    ├── data/             # исходные PDF, чанки, эмбеддинги, локальные модели
+    ├── docker-compose.yml
+    ├── pyproject.toml
+    └── .venv/
 ```
 
 ---
@@ -21,13 +28,9 @@ VolgaAsk/
 
 ---
 
-### `src/`
-
-Исходный код.
+### `AiService/`
 
 #### `src/AiService/`
-
-RAG-сервис.
 
 | Папка | За что отвечает |
 |-------|-----------------|
@@ -36,4 +39,40 @@ RAG-сервис.
 | `database/` | ORM-модель, загрузка данных в pgvector |
 | `utils/` | Вспомогательные утилиты |
 | `scripts/` | Скрипты для запуска |
-| `data/` | Данные: исходные PDF, чанки, эмбеддинги, локальные модели |
+
+#### `tests/`
+
+`test_search.py` проверяет, что нужные фрагменты документов попадают в top-5 по 20 контрольным вопросам; ожидаемые подстроки лежат в `tests/data/questions.json`.
+
+#### `data/`
+
+Исходные PDF (`raw/`), результаты обработки (`processed/`, `chunks/`, `embeddings/`) и локально скачанные модели (`models/`).
+
+---
+
+## Запуск
+
+Все команды — из папки `AiService`.
+
+```bash
+# 1. PostgreSQL + pgvector
+docker compose up -d
+
+# 2. Установка пакета в editable-режиме (зависимости уже в .venv)
+.venv/Scripts/python -m pip install -e . --no-deps
+
+# 3. Обработка и индексация корпуса (если ещё не сделано)
+.venv/Scripts/python -m AiService.scripts.index
+
+# 4. Поиск
+.venv/Scripts/python -m AiService.scripts.search "Кто избирает ректора?" --top-k 5
+
+# 5. Тесты
+.venv/Scripts/python -m pytest -v
+```
+
+На Linux/macOS путь к интерпретатору — `.venv/bin/python`.
+
+Engine создаётся в `AiService/database/session.py` (`create_db_engine()`): адрес берётся из `DATABASE_URL`, подключение ограничено `CONNECT_TIMEOUT_SECONDS`. Если векторная БД выключена, `Retriever` открывает соединение до загрузки моделей и сразу падает с `OperationalError`, а не висит на неопределённый таймаут; `search.py` в этом случае печатает подсказку `docker compose up -d`.
+
+Тесты не требуют установки пакета: путь `src` pytest добавляет сам (настройка `pythonpath` в `pyproject.toml`). Установка из шага 2 нужна, чтобы скрипты запускались как `python -m AiService.scripts.*`.
