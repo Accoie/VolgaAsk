@@ -1,24 +1,12 @@
-"""Интеграционные тесты retriever'а по корпусу документов Волгатеха.
-
-Путь к корню проекта добавляется в sys.path в conftest.py — pytest загружает
-его до импорта этого модуля, поэтому импорты AiService ниже обычные,
-без noqa.
-
-Запуск (из корня проекта):
-
-    python -m pytest test -v
-
-Требуется поднятый PostgreSQL (docker start ai-service-pgvector)
-с проиндексированным корпусом.
-"""
-
 import json
+from collections.abc import Iterator
 from pathlib import Path
 
 import pytest
-from sqlalchemy import create_engine
+from sqlalchemy.engine import Engine
 
-from AiService.configs.config import DatabaseConfig, ModelsConfig
+from AiService.configs.config import ModelsConfig
+from AiService.database.session import create_db_engine
 from AiService.processing.retriever import Retriever
 
 QUESTIONS_PATH = Path(__file__).parent / "data" / "questions.json"
@@ -30,12 +18,17 @@ def _load_questions() -> list[dict]:
 
 
 @pytest.fixture(scope="session")
-def retriever() -> Retriever:
-    engine = create_engine(DatabaseConfig.DATABASE_URL)
+def engine() -> Iterator[Engine]:
+    engine = create_db_engine()
     try:
-        yield Retriever(engine, ModelsConfig.EMBEDDER, ModelsConfig.RERANKER)
+        yield engine
     finally:
         engine.dispose()
+
+
+@pytest.fixture(scope="session")
+def retriever(engine: Engine) -> Iterator[Retriever]:
+    yield Retriever(engine, ModelsConfig.EMBEDDER, ModelsConfig.RERANKER)
 
 
 @pytest.mark.parametrize(
