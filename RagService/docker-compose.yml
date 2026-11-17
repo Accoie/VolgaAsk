@@ -1,11 +1,11 @@
 services:
   pgvector:
     image: pgvector/pgvector:pg17
-    container_name: ai-service-pgvector
+    container_name: rag-service-pgvector
     environment:
-      POSTGRES_USER: ai_service
+      POSTGRES_USER: rag_service
       POSTGRES_PASSWORD: secret
-      POSTGRES_DB: ai_service
+      POSTGRES_DB: rag_service
     ports:
       - "5432:5432"
     volumes:

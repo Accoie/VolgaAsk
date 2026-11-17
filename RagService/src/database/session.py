@@ -3,7 +3,7 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 
-DEFAULT_DATABASE_URL = "postgresql+psycopg://ai_service:secret@localhost:5432/ai_service"
+DEFAULT_DATABASE_URL = "postgresql+psycopg://rag_service:secret@localhost:5432/rag_service"
 
 CONNECT_TIMEOUT_SECONDS = 5
 

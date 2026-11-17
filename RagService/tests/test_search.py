@@ -49,5 +49,5 @@ def test_search_finds_expected_text(retriever: Retriever, case: dict) -> None:
     assert not missing, (
         f"Вопрос: {case['question']}\n"
         f"Не найдены подстроки: {missing}\n"
-        f"Найдены: {[t[:100] for t in texts]}"
+        f"Найдены: {[t for t in texts]}"
     )

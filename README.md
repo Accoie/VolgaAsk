@@ -11,7 +11,7 @@ VolgaAsk/
 ├── README.md
 ├── ROADMAP.md
 ├── docs/                 # документация проекта
-└── AiService/            # RAG-модуль
+└── RagService/           # RAG-модуль
     ├── src/              # пакет: конвертация, чанкинг, эмбеддинги, поиск
     ├── tests/            # pytest-тесты поиска по корпусу
     ├── data/             # исходные PDF, чанки, эмбеддинги, локальные модели
@@ -26,8 +26,8 @@ VolgaAsk/
 
 Документация: описание архитектуры.
 
-### `AiService/`
+### `RagService/`
 
-RAG-модуль, вся документация о нем в `AiService/README.md`.
+RAG-модуль, вся документация о нем в `RagService/README.md`.
 
 
