@@ -1,0 +1,84 @@
+{
+  "id": "material_assistance",
+  "title": "Заявление на материальную помощь",
+  "description": "Заявление студента об оказании материальной помощи с указанием причины и подтверждающего документа.",
+  "aliases": [
+    "материалка",
+    "матпомощь",
+    "материальная помощь",
+    "заявление на материальную помощь"
+  ],
+  "template_file": "template.docx",
+  "source_document": "zav_mat_help.docx",
+  "output_format": "docx",
+  "fields": [
+    {
+      "key": "group",
+      "label": "Учебная группа",
+      "type": "string",
+      "required": true,
+      "question": "Какая у тебя учебная группа?"
+    },
+    {
+      "key": "faculty",
+      "label": "Факультет / институт",
+      "type": "string",
+      "required": true,
+      "question": "На каком факультете или в каком институте ты учишься?"
+    },
+    {
+      "key": "full_name",
+      "label": "ФИО полностью",
+      "type": "string",
+      "required": true,
+      "question": "Напиши свои фамилию, имя и отчество полностью."
+    },
+    {
+      "key": "inn",
+      "label": "ИНН",
+      "type": "string",
+      "required": true,
+      "question": "Укажи свой ИНН.",
+      "validation_hint": "Для физического лица обычно 12 цифр"
+    },
+    {
+      "key": "phone",
+      "label": "Контактный телефон",
+      "type": "string",
+      "required": true,
+      "question": "Укажи контактный номер телефона."
+    },
+    {
+      "key": "reason",
+      "label": "Причина обращения",
+      "type": "string",
+      "required": true,
+      "question": "Почему ты обращаешься за материальной помощью? Укажи формулировку для заявления."
+    },
+    {
+      "key": "supporting_document",
+      "label": "Подтверждающий документ",
+      "type": "string",
+      "required": true,
+      "question": "Какой документ подтверждает указанную причину обращения?"
+    },
+    {
+      "key": "date",
+      "label": "Дата заявления",
+      "type": "date",
+      "required": true,
+      "question": "Какую дату поставить в заявлении?",
+      "default": "today",
+      "format_in_docx": "DD.MM.YYYY"
+    }
+  ],
+  "protected_fields": [
+    "personal_signature",
+    "employee_signatures",
+    "incoming_registration_number"
+  ],
+  "notes": [
+    "Подписи старосты, профорга, сотрудника МФЦ и регистрационный номер не заполняются автоматически.",
+    "В исходном бланке нет поля для суммы материальной помощи."
+  ]
+}

@@ -1,0 +1,121 @@
+{
+  "id": "change_fio",
+  "title": "Заявление об изменении ФИО",
+  "description": "Заявление о внесении изменений в имя, фамилию или отчество в документах университета.",
+  "aliases": [
+    "смена фамилии",
+    "изменить фио",
+    "поменять фамилию",
+    "смена имени",
+    "ошибка в фамилии"
+  ],
+  "template_file": "template.docx",
+  "source_document": "zav_change_fio_v1.docx",
+  "output_format": "docx",
+  "fields": [
+    {
+      "key": "full_name",
+      "label": "ФИО полностью",
+      "type": "string",
+      "required": true,
+      "question": "Назови свои фамилию, имя и отчество полностью."
+    },
+    {
+      "key": "study_form",
+      "label": "Форма обучения",
+      "type": "string",
+      "required": true,
+      "question": "Какая у тебя форма обучения (очная, очно-заочная, заочная)?"
+    },
+    {
+      "key": "course",
+      "label": "Курс",
+      "type": "integer",
+      "required": true,
+      "question": "На каком курсе ты учишься?",
+      "constraints": {
+        "min": 1,
+        "max": 8
+      }
+    },
+    {
+      "key": "group",
+      "label": "Учебная группа",
+      "type": "string",
+      "required": true,
+      "question": "Какая у тебя учебная группа?"
+    },
+    {
+      "key": "specialty",
+      "label": "Направление / специальность",
+      "type": "string",
+      "required": true,
+      "question": "Какое у тебя направление подготовки или специальность?"
+    },
+    {
+      "key": "tuition_basis",
+      "label": "Условия оплаты обучения",
+      "type": "enum",
+      "required": true,
+      "question": "Ты обучаешься на месте без оплаты или с оплатой?",
+      "options": [
+        "без оплаты",
+        "с оплатой"
+      ]
+    },
+    {
+      "key": "faculty",
+      "label": "Факультет / институт",
+      "type": "string",
+      "required": true,
+      "question": "На каком факультете или в каком институте ты учишься?"
+    },
+    {
+      "key": "phone",
+      "label": "Контактный телефон",
+      "type": "string",
+      "required": true,
+      "question": "Укажи контактный номер телефона."
+    },
+    {
+      "key": "new_name_instrumental",
+      "label": "ФИО в новой форме (творительный падеж)",
+      "type": "string",
+      "required": true,
+      "question": "Как должны звучать новые ФИО после слов «Прошу считать меня»? Например: «Ивановым Иваном Ивановичем».",
+      "validation_hint": "Вставляется после «Прошу считать меня»; проверь падеж."
+    },
+    {
+      "key": "reason",
+      "label": "Причина изменения",
+      "type": "string",
+      "required": true,
+      "question": "По какой причине меняются ФИО (вступление в брак, исправление ошибки, изменение документов или другое)?"
+    },
+    {
+      "key": "supporting_document",
+      "label": "Подтверждающий документ",
+      "type": "string",
+      "required": true,
+      "question": "Какой подтверждающий документ прилагаешь (например, свидетельство о браке или паспорт)?"
+    },
+    {
+      "key": "date",
+      "label": "Дата заявления",
+      "type": "date",
+      "required": true,
+      "question": "Какую дату поставить в заявлении?",
+      "default": "today",
+      "format_in_docx": "DD.MM.YYYY"
+    }
+  ],
+  "protected_fields": [
+    "personal_signature",
+    "employee_signatures",
+    "incoming_registration_number"
+  ],
+  "notes": [
+    "Необходимо проверить грамматическую форму новых ФИО, поскольку текст бланка содержит «Прошу считать меня».",
+    "Подпись и регистрационный номер остаются пустыми."
+  ]
+}

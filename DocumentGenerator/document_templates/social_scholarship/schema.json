@@ -1,0 +1,76 @@
+{
+  "id": "social_scholarship",
+  "title": "Заявление о назначении государственной социальной стипендии",
+  "description": "Заявление о назначении государственной социальной стипендии по соответствующей категории.",
+  "aliases": [
+    "социальная стипендия",
+    "соцстипендия",
+    "соц стипендия",
+    "заявление на социальную стипендию"
+  ],
+  "template_file": "template.docx",
+  "source_document": "zav_soc_sch.docx",
+  "output_format": "docx",
+  "fields": [
+    {
+      "key": "group",
+      "label": "Учебная группа",
+      "type": "string",
+      "required": true,
+      "question": "Какая у тебя учебная группа?"
+    },
+    {
+      "key": "faculty",
+      "label": "Факультет / институт",
+      "type": "string",
+      "required": true,
+      "question": "На каком факультете или в каком институте ты учишься?"
+    },
+    {
+      "key": "full_name",
+      "label": "ФИО полностью",
+      "type": "string",
+      "required": true,
+      "question": "Напиши свои фамилию, имя и отчество полностью."
+    },
+    {
+      "key": "phone",
+      "label": "Контактный телефон",
+      "type": "string",
+      "required": true,
+      "question": "Укажи контактный номер телефона."
+    },
+    {
+      "key": "category",
+      "label": "Категория заявителя",
+      "type": "string",
+      "required": true,
+      "question": "К какой категории для назначения государственной социальной стипендии ты относишься?"
+    },
+    {
+      "key": "supporting_documents",
+      "label": "Прилагаемые документы",
+      "type": "string",
+      "required": true,
+      "question": "Какие подтверждающие документы приложишь? Перечисли их названия."
+    },
+    {
+      "key": "date",
+      "label": "Дата заявления",
+      "type": "date",
+      "required": true,
+      "question": "Какую дату поставить в заявлении?",
+      "default": "today",
+      "format_in_docx": "DD.MM.YYYY"
+    }
+  ],
+  "protected_fields": [
+    "personal_signature",
+    "employee_signatures",
+    "incoming_registration_number"
+  ],
+  "notes": [
+    "Указанная категория требует подтверждения документами; DG не определяет право на выплату.",
+    "Подпись сотрудника МФЦ и номер заявки не заполняются автоматически."
+  ]
+}

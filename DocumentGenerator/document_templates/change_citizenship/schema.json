@@ -1,0 +1,121 @@
+{
+  "id": "change_citizenship",
+  "title": "Заявление об изменении гражданства",
+  "description": "Заявление об изменении сведений о гражданстве после получения паспорта.",
+  "aliases": [
+    "поменять гражданство",
+    "смена гражданства",
+    "изменение гражданства",
+    "новый паспорт другого государства"
+  ],
+  "template_file": "template.docx",
+  "source_document": "zav_ch_citiz_v1.docx",
+  "output_format": "docx",
+  "fields": [
+    {
+      "key": "full_name",
+      "label": "ФИО полностью",
+      "type": "string",
+      "required": true,
+      "question": "Назови свои фамилию, имя и отчество полностью."
+    },
+    {
+      "key": "study_form",
+      "label": "Форма обучения",
+      "type": "string",
+      "required": true,
+      "question": "Какая у тебя форма обучения (очная, очно-заочная, заочная)?"
+    },
+    {
+      "key": "course",
+      "label": "Курс",
+      "type": "integer",
+      "required": true,
+      "question": "На каком курсе ты учишься?",
+      "constraints": {
+        "min": 1,
+        "max": 8
+      }
+    },
+    {
+      "key": "group",
+      "label": "Учебная группа",
+      "type": "string",
+      "required": true,
+      "question": "Какая у тебя учебная группа?"
+    },
+    {
+      "key": "specialty",
+      "label": "Направление / специальность",
+      "type": "string",
+      "required": true,
+      "question": "Какое у тебя направление подготовки или специальность?"
+    },
+    {
+      "key": "tuition_basis",
+      "label": "Условия оплаты обучения",
+      "type": "enum",
+      "required": true,
+      "question": "Ты обучаешься на месте без оплаты или с оплатой?",
+      "options": [
+        "без оплаты",
+        "с оплатой"
+      ]
+    },
+    {
+      "key": "faculty",
+      "label": "Факультет / институт",
+      "type": "string",
+      "required": true,
+      "question": "На каком факультете или в каком институте ты учишься?"
+    },
+    {
+      "key": "phone",
+      "label": "Контактный телефон",
+      "type": "string",
+      "required": true,
+      "question": "Укажи контактный номер телефона."
+    },
+    {
+      "key": "previous_citizenship",
+      "label": "Прежнее гражданство",
+      "type": "string",
+      "required": true,
+      "question": "Какое гражданство было раньше? Укажи фразу, подходящую после предлога «с» в заявлении."
+    },
+    {
+      "key": "new_citizenship",
+      "label": "Новое гражданство",
+      "type": "string",
+      "required": true,
+      "question": "Какое гражданство у тебя теперь? Укажи название государства в форме после слов «на гражданство».",
+      "validation_hint": "Обычно форма родительного падежа названия страны."
+    },
+    {
+      "key": "passport_country",
+      "label": "Государство, выдавшее новый паспорт",
+      "type": "string",
+      "required": true,
+      "question": "Паспорт гражданина какого государства ты получил? Укажи формулировку после слов «паспорт гражданина».",
+      "validation_hint": "Значение используется дважды: в причине изменения и в перечне приложений."
+    },
+    {
+      "key": "date",
+      "label": "Дата заявления",
+      "type": "date",
+      "required": true,
+      "question": "Какую дату поставить в заявлении?",
+      "default": "today",
+      "format_in_docx": "DD.MM.YYYY"
+    }
+  ],
+  "protected_fields": [
+    "personal_signature",
+    "employee_signatures",
+    "incoming_registration_number"
+  ],
+  "notes": [
+    "В оригинале гражданство и страна паспорта указаны в отдельных местах; сохраняем оба поля.",
+    "Подпись и регистрационный номер остаются пустыми."
+  ]
+}

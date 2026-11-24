@@ -1,0 +1,35 @@
+{
+  "schema_version": "0.1.0",
+  "templates": [
+    {
+      "id": "material_assistance",
+      "path": "material_assistance/schema.json",
+      "file": "material_assistance/template.docx",
+      "title": "Заявление на материальную помощь"
+    },
+    {
+      "id": "money_refund",
+      "path": "money_refund/schema.json",
+      "file": "money_refund/template.docx",
+      "title": "Заявление о возврате денежных средств"
+    },
+    {
+      "id": "change_fio",
+      "path": "change_fio/schema.json",
+      "file": "change_fio/template.docx",
+      "title": "Заявление об изменении ФИО"
+    },
+    {
+      "id": "change_citizenship",
+      "path": "change_citizenship/schema.json",
+      "file": "change_citizenship/template.docx",
+      "title": "Заявление об изменении гражданства"
+    },
+    {
+      "id": "social_scholarship",
+      "path": "social_scholarship/schema.json",
+      "file": "social_scholarship/template.docx",
+      "title": "Заявление о назначении государственной социальной стипендии"
+    }
+  ]
+}

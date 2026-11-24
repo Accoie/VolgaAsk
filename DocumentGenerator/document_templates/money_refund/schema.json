@@ -1,0 +1,122 @@
+{
+  "id": "money_refund",
+  "title": "Заявление о возврате денежных средств",
+  "description": "Заявление о возврате излишне перечисленных денежных средств за обучение либо проживание в общежитии.",
+  "aliases": [
+    "возврат денег",
+    "вернуть деньги за обучение",
+    "переплата за обучение",
+    "возврат за общежитие"
+  ],
+  "template_file": "template.docx",
+  "source_document": "zav_return_money.docx",
+  "output_format": "docx",
+  "fields": [
+    {
+      "key": "full_name",
+      "label": "ФИО полностью",
+      "type": "string",
+      "required": true,
+      "question": "Назови свои фамилию, имя и отчество полностью."
+    },
+    {
+      "key": "study_form",
+      "label": "Форма обучения",
+      "type": "string",
+      "required": true,
+      "question": "Какая у тебя форма обучения (очная, очно-заочная, заочная)?"
+    },
+    {
+      "key": "course",
+      "label": "Курс",
+      "type": "integer",
+      "required": true,
+      "question": "На каком курсе ты учишься?",
+      "constraints": {
+        "min": 1,
+        "max": 8
+      }
+    },
+    {
+      "key": "group",
+      "label": "Учебная группа",
+      "type": "string",
+      "required": true,
+      "question": "Какая у тебя учебная группа?"
+    },
+    {
+      "key": "specialty",
+      "label": "Направление / специальность",
+      "type": "string",
+      "required": true,
+      "question": "Какое у тебя направление подготовки или специальность?"
+    },
+    {
+      "key": "tuition_basis",
+      "label": "Условия оплаты обучения",
+      "type": "enum",
+      "required": true,
+      "question": "Ты обучаешься на месте без оплаты или с оплатой?",
+      "options": [
+        "без оплаты",
+        "с оплатой"
+      ]
+    },
+    {
+      "key": "faculty",
+      "label": "Факультет / институт",
+      "type": "string",
+      "required": true,
+      "question": "На каком факультете или в каком институте ты учишься?"
+    },
+    {
+      "key": "phone",
+      "label": "Контактный телефон",
+      "type": "string",
+      "required": true,
+      "question": "Укажи контактный номер телефона."
+    },
+    {
+      "key": "refund_purpose",
+      "label": "За что требуется возврат",
+      "type": "enum",
+      "required": true,
+      "question": "За что ты хочешь вернуть переплату — за обучение или проживание в общежитии?",
+      "options": [
+        "обучение",
+        "проживание в общежитии"
+      ]
+    },
+    {
+      "key": "receipt_pages",
+      "label": "Количество листов квитанций",
+      "type": "integer",
+      "required": true,
+      "question": "Сколько листов квитанций ты приложишь?",
+      "constraints": {
+        "min": 1,
+        "max": 100
+      }
+    },
+    {
+      "key": "date",
+      "label": "Дата заявления",
+      "type": "date",
+      "required": true,
+      "question": "Какую дату поставить в заявлении?",
+      "default": "today",
+      "format_in_docx": "DD.MM.YYYY"
+    }
+  ],
+  "protected_fields": [
+    "personal_signature",
+    "employee_signatures",
+    "incoming_registration_number"
+  ],
+  "notes": [
+    "Банковские реквизиты и выписка по карте перечислены в бланке как приложения и не вставляются в текст.",
+    "Банковские реквизиты и сами приложения студент должен приложить отдельно.",
+    "Подпись и входящий номер не заполняются автоматически.",
+    "Отдельного поля для суммы в исходном бланке нет."
+  ]
+}
