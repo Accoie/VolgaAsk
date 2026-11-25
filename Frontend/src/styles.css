@@ -1,0 +1,76 @@
+:root {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  color: #192536;
+  background: #f9fafc;
+  --blue: #245fcd;
+  --line: #dce2e9;
+}
+* { box-sizing: border-box }
+button, input, textarea, select { font: inherit }
+button { cursor: pointer; color: inherit; background: white; border: 1px solid var(--line); border-radius: 10px; padding: 9px 14px }
+button:hover:enabled { background: #eff4fd }
+button:disabled { cursor: default; opacity: .55 }
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px }
+.shell { height: 100dvh; display: flex; flex-direction: column }
+header { height: 70px; flex-shrink: 0; display: flex; align-items: center; gap: 18px; padding: 0 clamp(18px,4vw,62px); border-bottom: 1px solid var(--line); background: white }
+.brand { font-size: 26px; font-weight: 750; letter-spacing: -.07em; color: #192536 }
+.brand b, em { color: var(--blue); font-style: normal }
+.menu { border: 0; font-size: 20px; background: #f3f5f8; padding: 5px 10px }
+.profile, .row { display: flex; gap: 14px; align-items: center }
+.profile { margin-left: auto; font-size: 14px }
+.avatar { background: #e7efff; color: var(--blue); border-radius: 50%; width: 34px; height: 34px; display: grid; place-items: center; font-weight: 700 }
+small { display: block; font-size: 12px; color: #627186; margin-top: 2px }
+.layout { flex: 1; min-height: 0; display: flex; position: relative }
+aside { width: 260px; padding: 26px 18px 16px; border-right: 1px solid var(--line); background: #f1f4f8; display: flex; flex-direction: column; gap: 10px }
+aside h2 { font-size: 13px; color: #63738a; margin: 18px 8px 2px }
+nav { overflow-y: auto; flex: 1 }
+nav button, .tools button { display: block; width: 100%; text-align: left; border: 0; background: transparent; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+nav .selected { background: #e1eafa; color: #1d54b9 }
+.history-item { display: flex; align-items: center }
+.history-item button:first-child { min-width: 0 }
+.history-item .delete-chat { width: auto; flex-shrink: 0; padding-inline: 10px; font-size: 18px }
+.new { font-weight: 600; color: var(--blue) }
+.chat { min-width: 0; flex: 1; display: flex; flex-direction: column }
+.conversation { flex: 1; min-height: 0; overflow: auto; display: grid }
+.greeting { align-self: center; text-align: center; padding: 20px }
+.greeting .brand { font-size: clamp(52px,8vw,90px) }
+h1 { font-size: clamp(25px,3vw,38px); letter-spacing: -.045em; margin: 8px 0 24px }
+.greeting h1 { font-size: clamp(18px,3vw,32px); font-weight: 550 }
+.thread, .compose { width: min(100%, 840px); margin-inline: auto; padding: 22px }
+article + article { margin-top: 28px }
+.question { background: #e9f0ff; width: fit-content; max-width: 85%; border-radius: 17px 17px 4px 17px; padding: 12px 18px; margin-left: auto }
+.answer { margin-top: 22px }
+.answer .brand { font-size: 17px }
+.answer p, .question { line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere }
+.answer p { margin: 7px 0 }
+.compose { padding-bottom: clamp(18px,4vh,46px) }
+.compose form { display: grid; padding: 10px 12px; border: 1px solid #cdd7e4; border-radius: 22px; background: white; box-shadow: 0 5px 22px #2439530b }
+.compose textarea { width: 100%; border: 0; outline: 0; resize: none; background: transparent; padding: 6px }
+.compose-controls { display: flex; justify-content: space-between; align-items: center }
+.loading { display: flex; align-items: center; gap: 8px; color: #52627a; font-size: 14px; margin-block: 8px }
+.spinner { width: 16px; height: 16px; border: 2px solid #cddcff; border-top-color: var(--blue); border-radius: 50%; flex: none; animation: spin .75s linear infinite }
+@keyframes spin { to { transform: rotate(360deg) } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation: none } }
+.compose form:focus-within { border-color: var(--blue) }
+.send, .primary { color: white; background: var(--blue); border: 0; font-weight: 600 }
+.send { border-radius: 50%; width: 40px; height: 40px; padding: 0; font-size: 25px }
+.send:hover:enabled, .primary:hover:enabled { background: #164aa9 }
+.login { flex: 1; display: grid; place-items: center; padding: 20px }
+.card, .management form { padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: white; display: grid; gap: 16px }
+.card { width: min(100%, 390px) }
+.card h1 { margin: 0 0 6px }
+label { display: grid; gap: 6px; font-size: 14px; font-weight: 550 }
+label input, select { min-width: 0; padding: 10px; border: 1px solid #ccd4df; border-radius: 8px; background: white }
+[role=alert] { color: #9d323a }
+.management { flex: 1; padding: 28px max(18px,calc((100% - 760px)/2)); overflow-y: auto }
+.management h1 { margin-top: 20px }
+.row { padding: 15px 0; border-bottom: 1px solid var(--line); justify-content: space-between }
+.row span { overflow-wrap: anywhere }
+@media (max-width: 760px) {
+  aside { position: absolute; inset: 0 auto 0 0; z-index: 2; box-shadow: 8px 0 18px #162c4514 }
+  header { height: 60px; gap: 8px; padding: 0 12px }
+  .profile { gap: 8px; font-size: 12px }
+  .profile button { padding: 6px }
+  .avatar { display: none }
+  .compose, .thread { padding-inline: 12px }
+}
