@@ -5,6 +5,9 @@ namespace VolgaAsk;
 public sealed class AppDb(DbContextOptions<AppDb> options) : DbContext(options)
 {
     public DbSet<Account> Accounts => Set<Account>();
+    public DbSet<Chat> Chats => Set<Chat>();
+    public DbSet<Turn> Turns => Set<Turn>();
+
     public async Task<bool> TryCreate(Account account, CancellationToken ct)
     {
         Accounts.Add(account);
@@ -44,5 +47,8 @@ public sealed class AppDb(DbContextOptions<AppDb> options) : DbContext(options)
     {
         model.Entity<Account>().HasIndex(x => x.Login).IsUnique();
         model.Entity<Account>().Property(x => x.Role).HasConversion<string>();
+        model.Entity<Chat>().HasOne<Account>().WithMany().HasForeignKey(x => x.OwnerId);
+        model.Entity<Chat>().HasMany(x => x.Turns).WithOne().HasForeignKey(x => x.ChatId);
+        model.Entity<Chat>().HasIndex(x => new { x.OwnerId, x.UpdatedAt });
     }
 }

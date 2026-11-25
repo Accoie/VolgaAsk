@@ -9,6 +9,10 @@ public record Registration(string Login, string Name, string Password);
 public record CreateAccount(string Login, string Name, string Password, [Required] Role? Role);
 public record ChangeRole([Required] Role? Role);
 public record AccountInfo(Guid Id, string Login, string Name, Role Role);
+public record Ask([Required, MaxLength(4000)] string Question);
+public record ChatInfo(Guid Id, string Title, DateTime UpdatedAt);
+public record RagEvent(string Type, string Text = "");
+
 public sealed class CredentialRules : AbstractValidator<Registration>
 {
     public CredentialRules()

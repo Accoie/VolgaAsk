@@ -31,6 +31,11 @@ services.AddRateLimiter(options =>
             PermitLimit = 60, Window = TimeSpan.FromMinutes(1)
         }));
 });
+services.AddHttpClient<RagClient>(client =>
+{
+    client.BaseAddress = new Uri(config["RAG_URL"] ?? "http://rag:8000");
+    client.Timeout = TimeSpan.FromMinutes(12);
+});
 services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(
     new JsonStringEnumConverter(allowIntegerValues: false)));
 services.AddSwaggerGen();
