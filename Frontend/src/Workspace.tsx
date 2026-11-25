@@ -2,6 +2,14 @@ import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { api, post, roles, stream, type Account, type Chat, type Turn } from './api'
 import { Brand } from './Brand'
 import { Management } from './Management'
+import { DocumentCard } from './DocumentCard'
+
+const modes = [
+  { value: 'auto', label: 'Автоматически', icon: '✦' },
+  { value: 'question', label: 'Вопрос об университете', icon: '?' },
+  { value: 'document', label: 'Оформление документа', icon: '▤' },
+]
+
 export function Workspace({ account, signedOut }: { account: Account; signedOut: () => void }) {
   const [sidebar, setSidebar] = useState(false)
   const [page, setPage] = useState<'chat' | 'accounts'>('chat')
@@ -9,6 +17,10 @@ export function Workspace({ account, signedOut }: { account: Account; signedOut:
   const [id, setId] = useState('')
   const [turns, setTurns] = useState<Turn[]>([])
   const [draft, setDraft] = useState('')
+  const [mode, setMode] = useState('auto')
+  const [revision, setRevision] = useState<Turn | null>(null)
+  const [status, setStatus] = useState('')
+  const composer = useRef<HTMLTextAreaElement>(null)
   const [pending, setPending] = useState<Turn | null>(null)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
@@ -27,6 +39,7 @@ export function Workspace({ account, signedOut }: { account: Account; signedOut:
     try {
       const history = chatId ? await api<Turn[]>(`chats/${chatId}/messages`) : []
       setTurns(history); setId(chatId); setPage('chat'); setDraft('')
+      setRevision(null); setMode('auto')
       if (window.innerWidth < 760) setSidebar(false)
     } catch (e) { setError((e as Error).message) }
     finally { setBusy(false) }
@@ -43,7 +56,8 @@ export function Workspace({ account, signedOut }: { account: Account; signedOut:
         setId('')
         setTurns([])
         setDraft('')
-        }
+        setRevision(null); setMode('auto')
+      }
       setPage('chat')
     } catch (e) {
       setPage('chat')
@@ -64,14 +78,15 @@ export function Workspace({ account, signedOut }: { account: Account; signedOut:
     try {
       const chatId = id || (await api<Chat>('chats', post())).id
       setId(chatId)
-      await stream(chatId, question, token => {
+      await stream(chatId, { question, mode, reviseFile: revision?.fileId }, token => {
         answer += token
         setPending({ question, answer })
-      }, controller.signal)
+      }, setStatus, controller.signal)
       setTurns(await api<Turn[]>(`chats/${chatId}/messages`))
+      setRevision(null); setMode('auto')
     } catch (e) { setError((e as Error).message); setDraft(question) }
     finally {
-      setPending(null); active.current = null
+      setStatus(''); setPending(null); active.current = null
       await refresh().catch(e => setError(e.message))
       setBusy(false)
     }
@@ -91,20 +106,32 @@ export function Workspace({ account, signedOut }: { account: Account; signedOut:
         {account.role === 'Admin' && <button disabled={busy} onClick={() => {setPage('accounts'); setSidebar(false)}}>Пользователи</button>}</div></aside>}
       {page !== 'chat' ? <Management account={account} back={() => setPage('chat')} /> :
         <main className="chat"><section className="conversation">
-        {!turns.length && !pending ? <div className="greeting"><Brand /><h1>Чем могу помочь, <em>{account.name}</em>?</h1></div> :
+        {!turns.length && !pending ? <div className="greeting"><Brand /><h1>Чем могу помочь, <em>{account.name}</em>?</h1>
+          <div className="actions">{[['document','Создать документ'], ['question','Задать вопрос']].map(([value,label]) =>
+            <button key={value} onClick={() => { setMode(value); composer.current?.focus() }}>{label}</button>)}</div></div> :
           <div className="thread">{[...turns, ...(pending ? [pending] : [])].map((t, i) =>
           <article key={i}><div className="question">{t.question}</div><div className="answer">
             {t.answer && <p>{t.answer}</p>}
             {t === pending && <div className="loading" role="status">
               <span className="spinner" aria-hidden="true" />
-              {t.answer ? 'Продолжаю ответ…' : 'Думаю…'}
+              {status || (t.answer ? 'Продолжаю ответ…' : 'Думаю…')}
             </div>}
+            {t.fileId && <DocumentCard chatId={id} turn={t} busy={busy} revise={() => {
+              setRevision(t); setMode('document'); composer.current?.focus()
+            }} />}
           </div></article>)}<div ref={end} /></div>}
         </section><div className="compose">{error && <p role="alert">{error}</p>}
-          <form onSubmit={send}><textarea aria-label="Сообщение" value={draft} maxLength={4000}
-            placeholder="Напишите сообщение…" rows={2}
+          <form onSubmit={send}>
+            {revision && <small>Доработка · {revision.documentTitle}</small>}
+            <textarea ref={composer} aria-label="Сообщение" value={draft} maxLength={4000}
+            placeholder={revision ? 'Что нужно исправить в документе?' : 'Напишите сообщение…'} rows={2}
             onChange={e => setDraft(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); e.currentTarget.form?.requestSubmit() } }} />
             <div className="compose-controls">
+              <div className="mode-buttons" role="group" aria-label="Режим сообщения">
+                {modes.map(({ value, label, icon }) => <button type="button" key={value} disabled={busy}
+                  title={label} aria-label={label} aria-pressed={mode === value}
+                  onClick={() => { setMode(value); setRevision(null); composer.current?.focus() }}>{icon}</button>)}
+              </div>
               <button className="send" disabled={busy || !draft.trim()} aria-label="Отправить сообщение">↑</button>
             </div>
           </form></div></main>}

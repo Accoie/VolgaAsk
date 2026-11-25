@@ -47,6 +47,9 @@ article + article { margin-top: 28px }
 .compose form { display: grid; padding: 10px 12px; border: 1px solid #cdd7e4; border-radius: 22px; background: white; box-shadow: 0 5px 22px #2439530b }
 .compose textarea { width: 100%; border: 0; outline: 0; resize: none; background: transparent; padding: 6px }
 .compose-controls { display: flex; justify-content: space-between; align-items: center }
+.mode-buttons { display: flex; gap: 4px; align-items: center }
+.mode-buttons button { width: 32px; height: 32px; padding: 0; border: 1px solid transparent; color: #52627a; font-size: 16px }
+.mode-buttons button[aria-pressed="true"] { color: var(--blue); background: #eaf1ff; border-color: #cddcff }
 .loading { display: flex; align-items: center; gap: 8px; color: #52627a; font-size: 14px; margin-block: 8px }
 .spinner { width: 16px; height: 16px; border: 2px solid #cddcff; border-top-color: var(--blue); border-radius: 50%; flex: none; animation: spin .75s linear infinite }
 @keyframes spin { to { transform: rotate(360deg) } }
@@ -74,3 +77,15 @@ label input, select { min-width: 0; padding: 10px; border: 1px solid #ccd4df; bo
   .avatar { display: none }
   .compose, .thread { padding-inline: 12px }
 }
+.document-card { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 20px; margin: 12px 0 }
+.document-card h3, .document-card h4 { margin: 0 0 6px }
+.preview-button { margin: 14px 0; color: var(--blue) }
+.preview-dialog { width: min(960px, 96vw); height: 90dvh; border: 1px solid var(--line); border-radius: 14px; padding: 14px; color: inherit }
+.preview-dialog[open] { display: flex; flex-direction: column; gap: 8px }
+.preview-dialog::backdrop { background: #19253699 }
+.preview-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px }
+.preview-dialog iframe { flex: 1; border: 0; width: 100% }
+.paper { white-space: pre-wrap; font-family: Georgia, serif; padding: 22px; margin-top: 12px; background: #fafafa }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px }
+.greeting .actions { justify-content: center }
+.actions a { color: var(--blue); font-weight: 600 }

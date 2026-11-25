@@ -1,7 +1,8 @@
 export type Role = 'User' | 'Employee' | 'Admin'
 export type Account = { id: string; login: string; name: string; role: Role }
 export type Chat = { id: string; title: string; updatedAt: string }
-export type Turn = { question: string; answer: string }
+export type Turn = { question: string; answer: string; fileId?: string; documentTitle?: string;
+  preview?: string; report?: string; awaitingConfirmation?: boolean }
 export const roles: Record<Role, string> = { User: 'Пользователь', Employee: 'Сотрудник', Admin: 'Администратор' }
 
 export function post(body?: unknown): RequestInit {
@@ -29,8 +30,9 @@ export async function api(path: string, options?: RequestInit): Promise<unknown>
   return text ? JSON.parse(text) : undefined
 }
 
-export async function stream(id: string, question: string, token: (s: string) => void, signal: AbortSignal) {
-  const response = await request(`chats/${id}/messages`, { ...post({ question }), signal })
+export async function stream(id: string, input: { question: string; mode: string; reviseFile?: string },
+  token: (s: string) => void, status: (s: string) => void, signal: AbortSignal) {
+  const response = await request(`chats/${id}/messages`, { ...post(input), signal })
   const reader = response.body!.pipeThrough(new TextDecoderStream()).getReader()
   let pending = ''
   try {
@@ -47,6 +49,7 @@ export async function stream(id: string, question: string, token: (s: string) =>
         if (event.type === 'done') return
         if (event.type === 'error') throw new Error(event.text)
         if (event.type === 'token') token(event.text)
+        if (event.type === 'status') status(event.text)
       }
     }
   } finally {
