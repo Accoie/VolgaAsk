@@ -1,0 +1,6 @@
+*
+!src/**
+!document_templates/**
+!pyproject.toml
+!README.md
+**/__pycache__

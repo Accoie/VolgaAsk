@@ -1,0 +1,6 @@
+/.env
+/storage/
+/Backend/bin/
+/Backend/obj/
+/Frontend/node_modules/
+/Frontend/dist/

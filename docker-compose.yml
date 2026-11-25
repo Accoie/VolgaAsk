@@ -1,0 +1,105 @@
+name: ragservice
+include:
+  - RagService/docker-compose.yml
+
+services:
+  app-db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: volgaask
+      POSTGRES_USER: volgaask
+      POSTGRES_PASSWORD: ${APP_DB_PASSWORD:?Set APP_DB_PASSWORD in .env}
+    volumes:
+      - app_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U volgaask -d volgaask"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  model:
+    image: ollama/ollama:latest
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen2.5:3b}
+    entrypoint: ["/bin/sh", "-ec"]
+    command: ['until ollama list >/dev/null 2>&1; do sleep 2; done; ollama show "$$OLLAMA_MODEL" >/dev/null 2>&1 || ollama pull "$$OLLAMA_MODEL"']
+    depends_on:
+      - ollama
+
+  rag:
+    build: ./RagService
+    environment:
+      DATABASE_URL: postgresql+psycopg://rag_service:secret@pgvector:5432/rag_service
+      OLLAMA_HOST: http://ollama:11434
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen2.5:3b}
+    volumes:
+      - ./RagService/data:/app/data
+      - model_cache:/root/.cache
+    depends_on:
+      pgvector:
+        condition: service_started
+      model:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  generator:
+    build: ./DocumentGenerator
+    environment:
+      DOCUMENT_TEMPLATES_DIR: /catalog/templates
+      OLLAMA_HOST: http://ollama:11434
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen2.5:3b}
+    volumes:
+      - ./storage/catalog:/catalog
+    depends_on:
+      model:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  reviewer:
+    build: ./DocumentReview
+    env_file:
+      - path: ./DocumentReview/.env
+        required: false
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen2.5:3b}
+      TRUST_COMPOSE_OLLAMA: "1"
+      GIGACHAT_CA_BUNDLE: /app/certs/gigachat-ca.pem
+    volumes:
+      - ./storage:/storage:ro
+    restart: unless-stopped
+
+  backend:
+    build: ./Backend
+    environment:
+      DB_PASSWORD: ${APP_DB_PASSWORD:?Set APP_DB_PASSWORD in .env}
+      ADMIN_LOGIN: ${ADMIN_LOGIN:-admin}
+      ADMIN_NAME: ${ADMIN_NAME:-Администратор}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD in .env}
+      RAG_URL: http://rag:8000
+    depends_on:
+      app-db:
+        condition: service_healthy
+      generator:
+        condition: service_started
+      reviewer:
+        condition: service_started
+    volumes:
+      - auth_keys:/app/keys
+      - ./storage:/storage
+    restart: unless-stopped
+
+  web:
+    build: ./Frontend
+    ports:
+      - "127.0.0.1:${WEB_PORT:-8080}:8080"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  app_data:
+  auth_keys:
+  model_cache:

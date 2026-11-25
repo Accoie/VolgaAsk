@@ -1,0 +1,5 @@
+*
+!src/**
+!certs/**
+!pyproject.toml
+**/__pycache__
