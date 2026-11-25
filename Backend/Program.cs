@@ -36,6 +36,13 @@ services.AddHttpClient<RagClient>(client =>
     client.BaseAddress = new Uri(config["RAG_URL"] ?? "http://rag:8000");
     client.Timeout = TimeSpan.FromMinutes(12);
 });
+foreach (var service in new[] { "generator", "reviewer" })
+    services.AddHttpClient(service, client =>
+    {
+        client.BaseAddress = new Uri($"http://{service}:8000");
+        client.Timeout = TimeSpan.FromMinutes(10);
+    });
+services.AddScoped<Documents>();
 services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(
     new JsonStringEnumConverter(allowIntegerValues: false)));
 services.AddSwaggerGen();

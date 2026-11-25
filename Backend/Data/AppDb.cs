@@ -41,6 +41,11 @@ public sealed class AppDb(DbContextOptions<AppDb> options) : DbContext(options)
             END IF;
         END;
         $$;
+        ALTER TABLE "Chats" ADD COLUMN IF NOT EXISTS "Draft" text;
+        ALTER TABLE "Turns" ADD COLUMN IF NOT EXISTS "FileId" uuid,
+            ADD COLUMN IF NOT EXISTS "DocumentTitle" text, ADD COLUMN IF NOT EXISTS "Preview" text,
+            ADD COLUMN IF NOT EXISTS "Report" text, ADD COLUMN IF NOT EXISTS "Revision" text,
+            ADD COLUMN IF NOT EXISTS "AwaitingConfirmation" boolean NOT NULL DEFAULT false;
         """);
 
     protected override void OnModelCreating(ModelBuilder model)

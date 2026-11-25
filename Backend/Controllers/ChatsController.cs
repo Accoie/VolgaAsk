@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace VolgaAsk;
 
 [ApiController, Route("api/chats")]
-public sealed class ChatsController(AppDb db, RagClient rag, ILogger<ChatsController> logger) : ControllerBase
+public sealed class ChatsController(AppDb db, RagClient rag, Documents documents, ILogger<ChatsController> logger) : ControllerBase
 {
     private IQueryable<Chat> Owned => db.Chats.Where(x => x.OwnerId == User.AccountId());
 
@@ -44,16 +44,43 @@ public sealed class ChatsController(AppDb db, RagClient rag, ILogger<ChatsContro
 
         await db.Entry(chat).Collection(x => x.Turns).Query().OrderByDescending(x => x.Id).Take(4).LoadAsync(ct);
         var question = input.Question.Trim();
+        var draft = chat.Draft;
+        var mode = input.Mode;
+        if (input.ReviseFile.HasValue)
+        {
+            draft = await db.Turns.Where(t => t.ChatId == id && t.FileId == input.ReviseFile)
+                .Select(t => t.Revision).SingleOrDefaultAsync(ct);
+            if (draft == null) return NotFound();
+            mode = "revise";
+        }
         Response.ContentType = "text/event-stream; charset=utf-8";
         Response.Headers.CacheControl = "no-cache";
         using var timeout = CancellationTokenSource.CreateLinkedTokenSource(ct);
         timeout.CancelAfter(TimeSpan.FromMinutes(10));
+        Guid? fileId = null;
+        var committed = false;
         try
         {
-            var answer = await StreamAnswer(question, chat, timeout.Token);
-            chat.Complete(question, answer);
+            var previous = draft == null && mode == "auto"
+                ? await db.Turns.Where(t => t.ChatId == id && t.FileId != null).OrderByDescending(t => t.Id)
+                    .Select(t => t.Revision).FirstOrDefaultAsync(ct) : null;
+            var step = mode == "question" ? null : await documents.Advance(question, draft, mode, previous, timeout.Token);
+            var answer = step?.Answer ?? await StreamAnswer(question, chat, timeout.Token);
+            if (step?.State == "REVIEW")
+                answer += "\n\nПосле подтверждения обезличенная копия пройдёт проверку в GigaChat.";
+            if (step?.File is { } file)
+            {
+                fileId = Guid.NewGuid();
+                await Documents.Save(id, fileId.Value, file.Content, ct);
+            }
+            var turn = chat.Complete(question, answer, step, fileId);
             await db.SaveChangesAsync(ct);
             await transaction.CommitAsync(ct);
+            committed = true;
+            if (fileId.HasValue)
+                await ReviewGenerated(turn);
+            else if (step != null)
+                await Emit("token", answer, ct);
             await Emit("done", "", ct);
         }
         catch (Exception ex) when (!ct.IsCancellationRequested)
@@ -61,7 +88,33 @@ public sealed class ChatsController(AppDb db, RagClient rag, ILogger<ChatsContro
             logger.LogWarning(ex, "Ошибка ответа в чате {Id}", id);
             await Emit("error", "Не удалось завершить ответ. Попробуйте ещё раз.", ct);
         }
+        finally
+        {
+            if (!committed && fileId.HasValue) System.IO.File.Delete(Documents.PathFor(id, fileId.Value));
+        }
         return new EmptyResult();
+    }
+
+    private async Task ReviewGenerated(Turn turn)
+    {
+        try
+        {
+            await Emit("status", "Документ сформирован. Обезличиваю и проверяю его…", HttpContext.RequestAborted);
+        }
+        catch (Exception) when (HttpContext.RequestAborted.IsCancellationRequested) { }
+        try
+        {
+            turn.SetReport(await documents.Review(turn.ChatId, turn.FileId!.Value, true, CancellationToken.None));
+        }
+        catch (ReviewException ex)
+        {
+            turn.SetReport(ex.Message);
+        }
+        catch (Exception ex) when (ex is HttpRequestException or OperationCanceledException)
+        {
+            turn.SetReport("Проверка не завершена. Документ сохранён и доступен для скачивания.");
+        }
+        await db.SaveChangesAsync();
     }
 
     [HttpDelete("{id:guid}")]
@@ -75,6 +128,8 @@ public sealed class ChatsController(AppDb db, RagClient rag, ILogger<ChatsContro
             return Conflict("Дождитесь завершения ответа в этом чате.");
         var deleted = await chat.ExecuteDeleteAsync(ct);
         await transaction.CommitAsync(ct);
+        if (deleted > 0 && Directory.Exists(Documents.Folder(id)))
+            Directory.Delete(Documents.Folder(id), true);
         return deleted == 0 ? NotFound() : NoContent();
     }
 
