@@ -72,11 +72,18 @@ class DocumentGenerator:
         conversation = self._conversation(session_id)
         with conversation.lock:
             session = conversation.session
-            try:
-                self._manager.handle(session, message)
-            except DocumentError as error:
-                session.message = str(error)
+            self.advance(session, message)
             return deepcopy(session)
+
+    def advance(self, session: DialogSession, message: str, *, revise: bool = False) -> None:
+        """Продолжает сохранённый диалог."""
+        try:
+            if revise:
+                self._manager.revise(session, message)
+            else:
+                self._manager.handle(session, message)
+        except DocumentError as error:
+            session.message = str(error)
 
     def is_ready(self, session_id: str) -> bool:
         """Проверяет готовность к подтверждению генерации."""

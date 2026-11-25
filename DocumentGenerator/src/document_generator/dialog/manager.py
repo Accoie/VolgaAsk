@@ -46,6 +46,15 @@ class DialogManager:
         else:
             self._clarify(session, response["reply"])
 
+    def revise(self, session: DialogSession, message: str) -> None:
+        """Применяет правки к полям ранее созданного документа."""
+        template = self.registry.get(session.template_id)
+        session.state = DialogState.REVIEW
+        extracted = self.extractor.extract(template, message, None, initial=True)
+        self._save_updates(session, template, extracted, "Укажи поле и его новое значение.")
+        if not extracted:
+            session.message += "\n" + self._review(session, template)
+
     def _clarify(self, session: DialogSession, reply: str) -> None:
         """Отвечает и возвращает пользователя к текущему шагу."""
         template = self.registry.get(session.template_id)
