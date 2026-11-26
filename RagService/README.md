@@ -5,8 +5,8 @@
 | Папка | За что отвечает |
 |-------|-----------------|
 | `configs/` | Пути, имена моделей, параметры БД |
-| `processing/` | Конвертация, чанкинг, эмбеддинги, поиск, **генерация** |
-| `database/` | ORM-модель, загрузка данных в pgvector |
+| `processing/` | Эмбеддинг запроса, поиск, ранжирование и генерация |
+| `database/` | Подключение к pgvector и модель поискового фрагмента |
 | `utils/` | Вспомогательные утилиты |
 | `scripts/` | Скрипты для запуска |
 
@@ -16,32 +16,12 @@
 
 #### `data/`
 
-Исходные PDF (`raw/`), результаты обработки (`chunks/`, `embeddings/`) и локально скачанные модели (`models/`).
+Локальный кеш моделей находится в `data/models/`. Исходный корпус перенесён в `../storage/kb/bootstrap/`. Публикацией и удалением фрагментов занимается отдельный DocumentIndexer.
 
 ## Запуск
 
 ```bash
-# 1. Разбиение PDF на чанки
-python -m src.scripts.chunk
-
-# 2. Создание эмбеддингов для чанков
-python -m src.scripts.embed
-
-# 3. Вставка векторов в PostgreSQL
-python -m src.scripts.index
-
-# 4. PostgreSQL + pgvector
-docker compose up -d
-
-# 5. Скачивание LLM-модели 
-docker exec -it ollama ollama pull qwen2.5:3b
-
-# 6. Поиск
-python -m src.scripts.search "Кто избирает ректора?" --top-k 5
-
-# 7. Запуск тестов (запуск из папки tests/)
-python -m pytest -v
-
-# 8. Запуск скрипта с генерацией ответов
-python -m src.scripts.generate --top-k 5
+# Из корня VolgaAsk
+docker compose up -d --build
+docker compose exec rag python -m scripts.search "Кто избирает ректора?" --top-k 5
 ```
