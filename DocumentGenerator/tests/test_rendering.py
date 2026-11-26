@@ -75,5 +75,6 @@ def test_renders_template(template_id: str, registry: TemplateRegistry) -> None:
         for part, paragraphs in read_paragraphs(template.path).items()
     }
     with TemporaryDirectory(prefix="volgaask-test-") as directory:
-        output = DocumentRenderer(Path(directory)).render(template, values)
+        published = template.model_copy(update={"content": template.path.read_bytes(), "path": None})
+        output = DocumentRenderer(Path(directory)).render(published, values)
         assert read_paragraphs(output) == expected
