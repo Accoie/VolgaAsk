@@ -16,6 +16,12 @@ var connection = config.GetConnectionString("App") ?? new NpgsqlConnectionString
 }.ConnectionString;
 
 services.AddDbContext<AppDb>(options => options.UseNpgsql(connection));
+var kbConnection = config["KB_CONNECTION"] ?? new NpgsqlConnectionStringBuilder
+{
+    Host = "pgvector", Database = "rag_service", Username = "rag_service",
+    Password = config["KB_PASSWORD"] ?? throw new InvalidOperationException("Set KB_PASSWORD.")
+}.ConnectionString;
+services.AddDbContext<KbStore>(options => options.UseNpgsql(kbConnection));
 services.AddSingleton<PasswordHasher<Account>>();
 services.AddSingleton<CredentialRules>();
 services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(Auth.Configure);
