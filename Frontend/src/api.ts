@@ -11,7 +11,7 @@ export function post(body?: unknown): RequestInit {
   }
 }
 
-async function request(path: string, options?: RequestInit) {
+export async function request(path: string, options?: RequestInit) {
   const response = await fetch('/api/' + path, options)
   if (response.ok) return response
   if (response.status === 401 && path !== 'auth/login') window.dispatchEvent(new Event('session-expired'))

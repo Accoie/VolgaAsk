@@ -1,0 +1,72 @@
+.theme-toggle {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  margin-left: auto;
+  padding: 0;
+  font-size: 20px;
+  line-height: 1;
+}
+.header-user-controls .theme-toggle { margin-left: 0 }
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  color: #f1f1f1;
+  background: #181818;
+  --blue: #85b6ff;
+  --line: #393939;
+  --surface: #242424;
+  --hover: #333;
+  --muted: #b8b8b8;
+  --selection: #183b6d;
+}
+
+[data-theme="dark"] :is(header, aside) { background: #161616 }
+[data-theme="dark"] .profile-user { background: #292929 }
+[data-theme="dark"] .brand { color: inherit }
+[data-theme="dark"] .chat { background: #181818 }
+[data-theme="dark"] .question { background: var(--selection); color: #f5f8ff }
+[data-theme="dark"] :is(button, .card, .management form, .document-card, dialog,
+  .editor-toolbar, .component-panel) { background: var(--surface) }
+[data-theme="dark"] :is(nav button, .tools button, .mode-buttons button, .management-tabs button) {
+  background: transparent;
+}
+[data-theme="dark"] :is(button:hover:enabled, .history-item:hover, .history-item:has(.selected):hover,
+  .kb-preview-link:hover) { background: var(--hover) }
+[data-theme="dark"] .history-item button:first-child:hover:enabled { background: transparent }
+[data-theme="dark"] :is(.avatar, nav .selected, .kb [aria-pressed="true"], .mode-buttons button[aria-pressed="true"]) {
+  background: var(--selection);
+  color: #b7d5ff;
+  border-color: #365781;
+}
+[data-theme="dark"] .tools .management-link:hover:enabled { color: #b7d5ff }
+[data-theme="dark"] .compose form { background: #303030; border-color: #444; box-shadow: none }
+[data-theme="dark"] .compose form:focus-within { border-color: var(--blue) }
+[data-theme="dark"] .compose textarea { color: inherit }
+[data-theme="dark"] .compose textarea::placeholder,
+[data-theme="dark"] input::placeholder { color: var(--muted) }
+[data-theme="dark"] :is(.send, .primary) { background: #285fbb }
+[data-theme="dark"] :is(.send, .primary):hover:enabled { background: #326bc7 }
+[data-theme="dark"] :is(small, aside h2, .loading, .mode-buttons button, .component-panel p, .configure-field,
+  .management-tabs button:not([aria-pressed="true"])) { color: var(--muted) }
+[data-theme="dark"] :is(label input, select, .kb-search, .template-editor input:not([type=checkbox])) {
+  color: inherit;
+  background: var(--surface);
+  border-color: var(--line);
+}
+[data-theme="dark"] [role="alert"] { color: #ffa4a9 }
+[data-theme="dark"] .history-item .delete-chat { color: #ffa4a9 }
+[data-theme="dark"] .history-item .delete-chat:hover:enabled { background: #51242a }
+[data-theme="dark"] .delete-dialog .danger { background: #aa3443 }
+[data-theme="dark"] .delete-dialog .danger:hover:enabled { background: #bb4050 }
+[data-theme="dark"] :is(.greeting-action-icon, .management-link img, .logout-button img) {
+  filter: brightness(0) saturate(100%) invert(73%) sepia(28%) saturate(1272%) hue-rotate(181deg);
+}
+[data-theme="dark"] .profile .logout-button:hover:enabled { background: var(--hover) }
+[data-theme="dark"] a { color: var(--blue) }
+[data-theme="dark"] .template-editor { background: #1c1c1c }
+[data-theme="dark"] .editor-document { background: #303030 }
+[data-theme="dark"] .paper { color: #192536 }
+[data-theme="dark"] :is(.preview-dialog, .delete-dialog)::backdrop { background: #000a }

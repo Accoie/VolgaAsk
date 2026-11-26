@@ -7,31 +7,165 @@
 }
 * { box-sizing: border-box }
 button, input, textarea, select { font: inherit }
-button { cursor: pointer; color: inherit; background: white; border: 1px solid var(--line); border-radius: 10px; padding: 9px 14px }
-button:hover:enabled { background: #eff4fd }
+button {
+  cursor: pointer;
+  color: inherit;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 9px 14px;
+  transition: background-color .16s ease, border-color .16s ease, color .16s ease, box-shadow .16s ease;
+}
+button:hover:enabled { background: #eff4fd; box-shadow: 0 2px 8px #24395312 }
 button:disabled { cursor: default; opacity: .55 }
+a { transition: color .16s ease, background-color .16s ease, text-decoration-color .16s ease }
+a:hover { text-decoration-thickness: 2px }
 :focus-visible { outline: 2px solid var(--blue); outline-offset: 2px }
 .shell { height: 100dvh; display: flex; flex-direction: column }
-header { height: 70px; flex-shrink: 0; display: flex; align-items: center; gap: 18px; padding: 0 clamp(18px,4vw,62px); border-bottom: 1px solid var(--line); background: white }
-.brand { font-size: 26px; font-weight: 750; letter-spacing: -.07em; color: #192536 }
-.brand b, em { color: var(--blue); font-style: normal }
+header { height: 70px; flex-shrink: 0; display: flex; align-items: center; gap: 18px; padding: 0 18px; border-bottom: 1px solid var(--line); background: white }
+.brand { display: inline-flex; align-items: center; gap: 0; font-size: 26px; font-weight: 750; letter-spacing: -.07em; color: #192536 }
+.brand-emblem { width: 36px; height: 36px; margin-left: 8px; object-fit: contain; flex: none }
+.brand b { color: var(--blue); font-style: normal }
+em { color: var(--blue); font-style: normal }
 .menu { border: 0; font-size: 20px; background: #f3f5f8; padding: 5px 10px }
 .profile, .row { display: flex; gap: 14px; align-items: center }
-.profile { margin-left: auto; font-size: 14px }
+.header-user-controls { display: flex; align-items: center; gap: 12px; margin-left: auto }
+.profile { gap: 10px; font-size: 14px }
+.profile-user { display: flex; align-items: center; gap: 10px; padding: 6px 12px 6px 8px; border-radius: 12px; background: #f1f3f6 }
+.profile .logout-button {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  padding: 6px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--blue);
+  transition: background-color .16s ease;
+}
+.profile .logout-button:hover:enabled { background: #e7efff }
+.logout-button img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  filter: brightness(0) saturate(100%) invert(29%) sepia(83%) saturate(1372%) hue-rotate(204deg) brightness(92%) contrast(93%);
+}
 .avatar { background: #e7efff; color: var(--blue); border-radius: 50%; width: 34px; height: 34px; display: grid; place-items: center; font-weight: 700 }
 small { display: block; font-size: 12px; color: #627186; margin-top: 2px }
 .layout { flex: 1; min-height: 0; display: flex; position: relative }
 aside { width: 260px; padding: 26px 18px 16px; border-right: 1px solid var(--line); background: #f1f4f8; display: flex; flex-direction: column; gap: 10px }
 aside h2 { font-size: 13px; color: #63738a; margin: 18px 8px 2px }
-nav { overflow-y: auto; flex: 1 }
+nav { overflow-x: hidden; overflow-y: auto; flex: 1 }
 nav button, .tools button { display: block; width: 100%; text-align: left; border: 0; background: transparent; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.tools .management-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--blue);
+  font-weight: 600;
+  border-radius: 10px;
+  transition: background-color .16s ease, color .16s ease;
+}
+.tools .management-link:hover:enabled { background: #e1eafa; color: #1d54b9 }
+.management-link img { width: 22px; height: 22px; flex: none; object-fit: contain; filter: brightness(0) saturate(100%) invert(29%) sepia(83%) saturate(1372%) hue-rotate(204deg) brightness(92%) contrast(93%) }
 nav .selected { background: #e1eafa; color: #1d54b9 }
-.history-item { display: flex; align-items: center }
-.history-item button:first-child { min-width: 0 }
-.history-item .delete-chat { width: auto; flex-shrink: 0; padding-inline: 10px; font-size: 18px }
+.history-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin: 2px 0;
+  border-radius: 10px;
+  transition: background-color .16s ease, box-shadow .16s ease, transform .16s ease;
+}
+.history-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--blue);
+  opacity: 0;
+  transform: scaleY(.45);
+  transition: opacity .16s ease, transform .16s ease;
+}
+.history-item:hover {
+  background: #e7edf6;
+  box-shadow: 0 5px 14px #2439530d;
+}
+.history-item:hover::before, .history-item:focus-within::before {
+  opacity: 1;
+  transform: scaleY(1);
+}
+.history-item:has(.selected):hover { background: #dbe6f8 }
+.history-item button:first-child {
+  min-width: 0;
+  flex: 1;
+  padding: 10px 42px 10px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  transition: color .16s ease, background-color .16s ease;
+}
+.history-item button:first-child:hover:enabled { background: transparent }
+.history-item .delete-chat {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  padding: 0;
+  border: 0;
+  text-align: center;
+  font-size: 17px;
+  line-height: 1;
+  border-radius: 7px;
+  color: #bb2d3b;
+  opacity: 0;
+  transform: translate(4px, -50%) scale(.9);
+  transition: opacity .16s ease, transform .16s ease, color .16s ease, background-color .16s ease;
+}
+.history-item:hover .delete-chat, .history-item:focus-within .delete-chat {
+  opacity: 1;
+  transform: translate(0, -50%) scale(1);
+}
+@media (hover: none) {
+  .history-item .delete-chat { opacity: 1; transform: translateY(-50%) }
+  .history-item:hover { box-shadow: none }
+}
+.history-item .delete-chat:hover:enabled { color: #a52634; background: #bb2d3b24 }
+.delete-dialog .danger { color: white; background: #bb2d3b }
+.delete-dialog .danger:hover:enabled { background: #992534 }
+.delete-dialog {
+  width: min(420px, calc(100% - 32px));
+  padding: 24px;
+  color: inherit;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+.delete-dialog::backdrop { background: #19253699 }
+.delete-dialog h2 { margin: 0; font-size: 22px }
+.delete-dialog p { overflow-wrap: anywhere }
+.delete-dialog .actions { justify-content: flex-end; margin-top: 24px }
 .new { font-weight: 600; color: var(--blue) }
-.chat { min-width: 0; flex: 1; display: flex; flex-direction: column }
-.conversation { flex: 1; min-height: 0; overflow: auto; display: grid }
+.chat {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #fbfcff;
+  background-image: linear-gradient(#ffffffee, #fafcfff5), url('./assets/chat-background.png');
+  background-position: center top;
+  background-size: auto, clamp(760px, 100%, 1672px) auto;
+}
+.conversation { flex: 1; min-height: 0; overflow: auto; display: grid; grid-template-columns: minmax(0, 1fr) }
+.compose-area { overflow: hidden; flex-shrink: 0 }
+.conversation, .compose-area { scrollbar-gutter: stable both-edges }
 .greeting { align-self: center; text-align: center; padding: 20px }
 .greeting .brand { font-size: clamp(52px,8vw,90px) }
 h1 { font-size: clamp(25px,3vw,38px); letter-spacing: -.045em; margin: 8px 0 24px }
@@ -43,6 +177,7 @@ article + article { margin-top: 28px }
 .answer .brand { font-size: 17px }
 .answer p, .question { line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere }
 .answer p { margin: 7px 0 }
+.markdown-text em { color: inherit; font-style: italic }
 .compose { padding-bottom: clamp(18px,4vh,46px) }
 .compose form { display: grid; padding: 10px 12px; border: 1px solid #cdd7e4; border-radius: 22px; background: white; box-shadow: 0 5px 22px #2439530b }
 .compose textarea { width: 100%; border: 0; outline: 0; resize: none; background: transparent; padding: 6px }
@@ -53,7 +188,11 @@ article + article { margin-top: 28px }
 .loading { display: flex; align-items: center; gap: 8px; color: #52627a; font-size: 14px; margin-block: 8px }
 .spinner { width: 16px; height: 16px; border: 2px solid #cddcff; border-top-color: var(--blue); border-radius: 50%; flex: none; animation: spin .75s linear infinite }
 @keyframes spin { to { transform: rotate(360deg) } }
-@media (prefers-reduced-motion: reduce) { .spinner { animation: none } }
+@media (prefers-reduced-motion: reduce) {
+  .spinner { animation: none }
+  .history-item, .history-item::before, .history-item .delete-chat { transition: none }
+  button, a { transition: none }
+}
 .compose form:focus-within { border-color: var(--blue) }
 .send, .primary { color: white; background: var(--blue); border: 0; font-weight: 600 }
 .send { border-radius: 50%; width: 40px; height: 40px; padding: 0; font-size: 25px }
@@ -65,16 +204,27 @@ article + article { margin-top: 28px }
 label { display: grid; gap: 6px; font-size: 14px; font-weight: 550 }
 label input, select { min-width: 0; padding: 10px; border: 1px solid #ccd4df; border-radius: 8px; background: white }
 [role=alert] { color: #9d323a }
-.management { flex: 1; padding: 28px max(18px,calc((100% - 760px)/2)); overflow-y: auto }
+.management { flex: 1; padding: 28px max(18px,calc((100% - 760px)/2)); overflow-y: auto; scrollbar-gutter: stable }
 .management h1 { margin-top: 20px }
+.kb details { margin: 18px 0 }
+.kb summary { cursor: pointer; padding: 10px 0; color: var(--blue) }
+.kb [aria-pressed="true"] { background: #e7efff; color: var(--blue) }
+.kb-search { width: 100%; margin-top: 16px; padding: 10px 12px; border: 1px solid #ccd4df; border-radius: 8px; background: white }
+.kb .row { gap: 12px; flex-wrap: wrap; overflow-wrap: anywhere }
+.kb-document-title { display: flex; align-items: center; gap: 8px; min-width: 0 }
+.kb-document-title > strong { min-width: 0 }
+.kb-preview-link { display: inline-flex; flex: none; padding: 5px; color: var(--blue); border-radius: 6px }
+.kb-preview-link:hover { background: #e7efff }
+.kb-preview-link svg { width: 20px; height: 20px }
 .row { padding: 15px 0; border-bottom: 1px solid var(--line); justify-content: space-between }
 .row span { overflow-wrap: anywhere }
 @media (max-width: 760px) {
   aside { position: absolute; inset: 0 auto 0 0; z-index: 2; box-shadow: 8px 0 18px #162c4514 }
-  header { height: 60px; gap: 8px; padding: 0 12px }
-  .profile { gap: 8px; font-size: 12px }
+  header { height: 60px; gap: 8px; padding: 0 18px }
+  .header-user-controls { gap: 6px }
+  .profile { gap: 6px; font-size: 12px }
+  .profile-user { gap: 7px; padding: 5px 8px 5px 6px }
   .profile button { padding: 6px }
-  .avatar { display: none }
   .compose, .thread { padding-inline: 12px }
 }
 .document-card { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 20px; margin: 12px 0 }
@@ -88,4 +238,6 @@ label input, select { min-width: 0; padding: 10px; border: 1px solid #ccd4df; bo
 .paper { white-space: pre-wrap; font-family: Georgia, serif; padding: 22px; margin-top: 12px; background: #fafafa }
 .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px }
 .greeting .actions { justify-content: center }
+.greeting .actions button { display: flex; flex-direction: column; align-items: center; gap: 12px; min-width: 190px; color: var(--blue); font-weight: 600 }
+.greeting-action-icon { width: 76px; height: 76px; object-fit: contain; filter: brightness(0) saturate(100%) invert(29%) sepia(83%) saturate(1372%) hue-rotate(204deg) brightness(92%) contrast(93%) }
 .actions a { color: var(--blue); font-weight: 600 }

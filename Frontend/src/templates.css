@@ -1,0 +1,39 @@
+.management-tabs {
+  display: flex; gap: 12px; margin: 0 0 24px;
+}
+.management-tabs button {
+  flex: 1; border: 0; border-bottom: 3px solid var(--line); border-radius: 0;
+  background: transparent; padding: 12px 4px; color: #52627a;
+}
+.management-tabs button[aria-pressed="true"] { border-color: var(--blue); color: var(--blue); font-weight: 600 }
+.template-editor { flex: 1; min-width: 0; overflow-y: auto; padding: 24px max(18px,calc((100% - 1200px)/2)); background: #f4f6fa }
+.editor-heading, .editor-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 8px }
+.editor-heading { margin-bottom: 18px }
+.editor-heading h1 { font-size: 1.3rem; margin: 0 auto 0 4px }
+.template-editor label { display: grid; gap: 5px; font-weight: 500 }
+.template-editor input:not([type=checkbox]) { min-width: 0; padding: 9px 12px; border: 1px solid var(--line); border-radius: 8px }
+.editor-layout { display: grid; grid-template-columns: minmax(0, 2fr) minmax(240px, 1fr); gap: 16px; margin-top: 16px; align-items: start }
+.editor-document { background: #e2e8f0; padding: 12px; border-radius: 12px; min-width: 0 }
+.editor-toolbar { background: white; border-radius: 8px; padding: 8px; margin-bottom: 8px }
+.editor-toolbar a { margin-left: auto; font-size: .88rem }
+.editor-paper { color: #191e28; background: white; padding: clamp(18px,4vw,54px); min-height: 60vh; cursor: text; font: 16px/1.5 "Times New Roman",serif }
+.editor-paper p { min-height: 1.5em; margin: 0 0 .2em; white-space: pre-wrap; overflow-wrap: anywhere }
+.editor-paper p:focus { outline: 1px dotted #9bb5e9 }
+.field-chip { background: #e2edff; color: #194eb6; border-radius: 4px; padding: 2px 3px; cursor: pointer }
+.component-panel { display: grid; gap: 10px; padding: 16px; background: white; border: 1px solid var(--line); border-radius: 12px }
+.component-panel h2 { margin: 0; font-size: 1.1rem }
+.component-panel p { margin: 0; font-size: .9rem; color: #53647d }
+.component-list { display: grid; gap: 6px; max-height: 55vh; overflow-y: auto }
+.component-list button { display: flex; justify-content: space-between; align-items: center; text-align: left }
+.component-list small { display: block; color: #52627a; font-size: .75rem }
+.component-list b { color: var(--blue) }
+.component-row { display: flex; gap: 4px }
+.component-row > button:first-child { flex: 1; min-width: 0 }
+.configure-field { color: #52627a; padding: 6px }
+.component-form { display: grid; gap: 10px }
+.component-form .check-field { display: flex; align-items: center; gap: 6px }
+@media (max-width: 760px) {
+  .editor-layout { grid-template-columns: minmax(0,1fr) }
+  .component-list { max-height: 240px }
+  .editor-paper { min-height: 260px }
+}

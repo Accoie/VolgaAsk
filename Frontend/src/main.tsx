@@ -1,11 +1,12 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { api, post, type Account } from './api'
 import { Workspace } from './Workspace'
 import { Brand } from './Brand'
 import './styles.css'
+import './theme.css'
 
-function Login({ signedIn }: { signedIn: (account: Account) => void }) {
+function Login({ signedIn, themeToggle }: { signedIn: (account: Account) => void; themeToggle: ReactNode }) {
   const [register, setRegister] = useState(false)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
@@ -19,7 +20,7 @@ function Login({ signedIn }: { signedIn: (account: Account) => void }) {
     } catch (e) { setError((e as Error).message) }
     finally { setBusy(false) }
   }
-  return <div className="shell"><header><Brand /></header><main className="login">
+  return <div className="shell"><header><Brand showEmblem />{themeToggle}</header><main className="login">
     <form className="card" onSubmit={submit}><h1>{register ? 'Регистрация' : 'Вход в чат'}</h1>
       <label>Логин<input autoFocus name="login" maxLength={64} required autoComplete="username" /></label>
       {register && <label>Имя<input name="name" required maxLength={80} autoComplete="given-name" /></label>}
@@ -33,6 +34,11 @@ function Login({ signedIn }: { signedIn: (account: Account) => void }) {
 
 function App() {
   const [account, setAccount] = useState<Account | null>()
+  const [dark, setDark] = useState(() => localStorage.getItem('volgaask.theme') === 'dark')
+  useEffect(() => {
+    document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+    localStorage.setItem('volgaask.theme', dark ? 'dark' : 'light')
+  }, [dark])
   useEffect(() => {
     const expire = () => setAccount(null)
     window.addEventListener('session-expired', expire)
@@ -40,7 +46,11 @@ function App() {
     return () => window.removeEventListener('session-expired', expire)
   }, [])
   if (account === undefined) return <main className="login">Загрузка…</main>
-  return account ? <Workspace account={account} signedOut={() => setAccount(null)} /> : <Login signedIn={setAccount} />
+  const themeLabel = dark ? 'Включить светлую тему' : 'Включить тёмную тему'
+  const themeToggle = <button type="button" className="theme-toggle" aria-label={themeLabel} title={themeLabel}
+    onClick={() => setDark(value => !value)}><span aria-hidden="true">{dark ? '☀' : '☾'}</span></button>
+  return account ? <Workspace account={account} signedOut={() => setAccount(null)} themeToggle={themeToggle} />
+    : <Login signedIn={setAccount} themeToggle={themeToggle} />
 }
 
 createRoot(document.getElementById('root')!).render(<App />)

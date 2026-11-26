@@ -32,6 +32,6 @@ export function DocumentPreview({ url, title, fallback, close }: Props) {
     {loading && <div className="loading" role="status"><span className="spinner" aria-hidden="true" />Открываю DOCX…</div>}
     {failed ? <><p>Показываю текстовую версию документа.</p><div className="paper">{fallback}</div></> :
       <iframe title={title} ref={frame} sandbox="allow-same-origin" onLoad={() => setReady(true)}
-        srcDoc={`<!doctype html><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data: blob:; font-src data: blob:; style-src 'unsafe-inline'"><body style="margin:0"></body>`} />}
+        srcDoc={`<!doctype html><meta charset="utf-8"><meta name="color-scheme" content="light"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data: blob:; font-src data: blob:; style-src 'unsafe-inline'"><body style="margin:0;color:#191e28;background:white"></body>`} />}
   </dialog>
 }
