@@ -24,11 +24,34 @@ class FieldValidator:
             return cls._choice(field, text)
         if not isinstance(value, str):
             raise FieldError("Введи текст.")
+        if field.key == "study_form" and text.casefold() not in {"очной", "очно-заочной", "заочной"}:
+            return cls.study_form(text) or text
+        return text
+
+    @staticmethod
+    def study_form(text: str) -> str | None:
+        """Приводит распространённые ответы к форме для бланка."""
+        match = re.fullmatch(
+            r"(очно[-–— ]заочн|заочн|очн)(?:ая|ой|ую|а|о)(?:\s+форм[аеуы](?:\s+обучения)?)?",
+            text.strip().casefold(),
+        )
+        if match:
+            return re.sub(r"[–— ]", "-", match[1]) + "ая"
+        return None
+
+    @staticmethod
+    def integer_text(field: TemplateField, text: str) -> str:
+        """Убирает слово «курс» из короткого ответа."""
+        if field.key == "course":
+            match = re.fullmatch(r"(?:я\s+)?(?:на\s+)?([0-9]+)(?:-?(?:й|м|ый|ом))?\s+курсе?", text.casefold())
+            if match:
+                return match[1]
         return text
 
     @staticmethod
     def _integer(field: TemplateField, text: str) -> int:
         """Проверяет целое число и его границы."""
+        text = FieldValidator.integer_text(field, text)
         if not re.fullmatch(r"[+-]?[0-9]+", text):
             raise FieldError("Введи целое число.")
         try:
@@ -66,8 +89,14 @@ class FieldValidator:
     @staticmethod
     def _choice(field: TemplateField, text: str) -> str:
         """Находит значение среди допустимых вариантов."""
+        text = " ".join(text.casefold().split())
+        if field.key == "tuition_basis":
+            if text in {"бюджет", "на бюджете", "бесплатно", "без оплаты обучения"}:
+                text = "без оплаты"
+            elif text in {"платно", "договор", "по договору", "на платном", "с оплатой обучения"}:
+                text = "с оплатой"
         for option in field.options:
-            if text.casefold() == option.casefold():
+            if text == option.casefold():
                 return option
         raise FieldError("Выбери один из вариантов: " + ", ".join(field.options))
 

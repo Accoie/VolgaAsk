@@ -25,7 +25,7 @@ class TemplateField(BaseModel):
     label: Text | None = None
     type: Literal["string", "date", "integer", "boolean", "choice", "enum"]
     required: bool = True
-    question: Text
+    question: Text | None = None
     options: list[Text] = Field(default_factory=list)
     constraints: Bounds = Field(default_factory=Bounds)
     default: FieldValue | None = None
@@ -47,11 +47,15 @@ class TemplateField(BaseModel):
         return self.label or self.key
 
 
-class TemplateSchema(BaseModel):
+class TemplateChoice(BaseModel):
     id: Identifier
     title: Text = Field(validation_alias=AliasChoices("title", "name"))
     description: Text
     aliases: list[Text] = Field(default_factory=list)
+
+
+class TemplateSchema(TemplateChoice):
+    source_document: str | None = None
     fields: list[TemplateField] = Field(min_length=1)
     protected_fields: list[Identifier] = Field(default_factory=list)
     template_file: Literal["template.docx"] = "template.docx"
@@ -66,4 +70,5 @@ class TemplateSchema(BaseModel):
 
 
 class DocumentTemplate(TemplateSchema):
-    path: Path
+    path: Path | None = None
+    content: bytes | None = Field(default=None, exclude=True)

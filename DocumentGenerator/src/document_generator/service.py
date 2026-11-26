@@ -11,7 +11,7 @@ from .errors import DocumentError
 from .llm.base import BaseLLMProvider
 from .llm.ollama import OllamaProvider
 from .rendering.renderer import DocumentRenderer
-from .templates.registry import TemplateRegistry
+from .templates.database import DbRegistry
 from .templates.resolver import TemplateResolver
 from .templates.schemas import DocumentTemplate
 
@@ -27,7 +27,7 @@ class DocumentGenerator:
         """Собирает сервис генерации документов."""
         settings = settings or Settings.from_env()
         provider = provider or OllamaProvider(settings.ollama_host, settings.ollama_model)
-        self.registry = TemplateRegistry(settings.templates_dir)
+        self.registry = DbRegistry()
         self._manager = DialogManager(
             self.registry, TemplateResolver(self.registry, provider),
             FieldExtractor(provider), DocumentRenderer(settings.output_dir),

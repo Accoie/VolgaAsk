@@ -69,7 +69,7 @@ class FieldExtractor:
     @staticmethod
     def _instruction(labels: dict[str, str], current: TemplateField | None) -> str:
         """Собирает инструкцию для извлечения полей."""
-        focus = f"{current.key} — {current.question}" if current else "текущего поля нет, ищи явно указанные данные"
+        focus = f"{current.key} — {current.question or current.caption}" if current else "текущего поля нет, ищи явно указанные данные"
         return (
             "Извлеки только данные заявителя из последнего сообщения. "
             "Каждое значение копируй дословно из сообщения, без пояснений и догадок. "

@@ -1,10 +1,9 @@
 import base64
 import os
 import re
-import shutil
-from dataclasses import asdict, replace
+from contextlib import asynccontextmanager
+from dataclasses import asdict
 from pathlib import Path
-from tempfile import TemporaryDirectory
 
 from docx import Document
 from docx.table import Table
@@ -15,26 +14,23 @@ from .config import Settings
 from .dialog.session import DialogSession, DialogState
 from .llm.ollama import OllamaProvider
 from .service import DocumentGenerator
+from .templates.database import initialize
+from .templates.management import router
 
-def shared_settings() -> Settings:
-    """Размещает штатные шаблоны в общем каталоге при первом запуске."""
-    settings = Settings.from_env()
-    root = os.getenv("DOCUMENT_TEMPLATES_DIR")
-    if not root:
-        return settings
-    directory = Path(root)
-    if not directory.exists():
-        with TemporaryDirectory(dir=directory.parent) as temporary:
-            source = Path(temporary) / "templates"
-            shutil.copytree(settings.templates_dir, source, ignore=shutil.ignore_patterns("__pycache__", "*.py"))
-            source.rename(directory)
-    return replace(settings, templates_dir=directory)
-
-
-settings = shared_settings()
+settings = Settings.from_env()
 provider = OllamaProvider(settings.ollama_host, settings.ollama_model)
 generator = DocumentGenerator(settings, provider)
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app):
+    """Переносит штатный каталог до приёма запросов."""
+    legacy = Path(os.getenv("DOCUMENT_TEMPLATES_DIR", settings.templates_dir))
+    initialize(legacy if legacy.is_dir() else settings.templates_dir)
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
+app.include_router(router)
 
 
 class Message(BaseModel):
@@ -46,11 +42,9 @@ class Message(BaseModel):
 
 def intent(question: str, can_revise: bool) -> str:
     """Выбирает оформление, доработку или справочный ответ."""
-    opening = question.strip().casefold()
-    request = re.match(r"^(?:пожалуйста[, ]+)?(?:хочу|мне нужно|мне надо|помоги|создай|оформи|составь|подготовь|заполни)\b", opening)
-    has_action = re.search(r"\b(?:оформ|созда|соста[вь]|подготов|заполн)\w*", opening)
-    if request and has_action and re.search(r"\b(?:заявлени|материалк|матпомощ|документ|бланк)\w*", opening):
-        return "document"
+    direct = direct_intent(question)
+    if direct:
+        return direct
     instruction = (
         "Определи цель сообщения. document — человек просит составить или заполнить заявление "
         "(в том числе «хочу материалку оформить»). question — спрашивает о правилах, баллах, "
@@ -63,6 +57,26 @@ def intent(question: str, can_revise: bool) -> str:
     schema = {"type": "object", "properties": {"intent": {"type": "string", "enum": actions}},
               "required": ["intent"], "additionalProperties": False}
     return provider.request_json(instruction, question, schema)["intent"]
+
+
+def direct_intent(question: str) -> str | None:
+    """Распознаёт явную просьбу заполнить документ и справочные вопросы."""
+    opening = re.sub(r"^пожалуйста[, ]+", "", question.strip().casefold())
+    question_words = r"(?:как|где|когда|куда|зачем|сколько|кто|что|какие|нужно ли|надо ли)"
+    if re.match(rf"^(?:а\s+)?{question_words}\b", opening):
+        return "question"
+    if re.search(rf"\b(?:узнать|подскажи\w*|расскажи\w*)[ ,]+{question_words}\b", opening):
+        return "question"
+    subject = r"\b(?:заявлени\w*|материалк\w*|матпомощ\w*|материальн\w* помощ\w*|документ\w*|бланк\w*)\b"
+    if re.fullmatch(r"(?:материалк\w*|матпомощ\w*)[.!]?", opening):
+        return "document"
+    action = r"(?:оформ|созда|соста[вь]|подготов|заполн)\w*"
+    request = rf"\b(?:хочу|нужно|надо|помоги(?:те)?)\s+(?:\w+\s+){{0,4}}?{action}\b"
+    command = r"^(?:оформи|создай|составь|подготовь|заполни)(?:те)?\b"
+    if re.search(subject, opening) and not re.search(r"\bне\b", opening):
+        if re.search(request, opening) or re.match(command, opening):
+            return "document"
+    return None
 
 
 def preview(path) -> str:

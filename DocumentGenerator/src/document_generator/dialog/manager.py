@@ -1,9 +1,10 @@
+import re
 from pathlib import Path
 
-from ..errors import DocumentError, FieldError
+from ..errors import DocumentError, FieldError, ProviderError
 from ..rendering.renderer import DocumentRenderer
 from ..rendering.validator import FieldValidator, display_value
-from ..templates.registry import TemplateRegistry
+from ..templates.database import DbRegistry
 from ..templates.resolver import TemplateResolver
 from ..templates.schemas import DocumentTemplate, TemplateField
 from .extractor import FieldExtractor
@@ -11,7 +12,7 @@ from .session import DialogSession, DialogState
 from .interpreter import DialogInterpreter
 
 class DialogManager:
-    def __init__(self, registry: TemplateRegistry, resolver: TemplateResolver,
+    def __init__(self, registry: DbRegistry, resolver: TemplateResolver,
                  extractor: FieldExtractor, renderer: DocumentRenderer):
         """Подключает компоненты диалога."""
         self.registry = registry
@@ -27,14 +28,19 @@ class DialogManager:
         if session.state == DialogState.IDLE:
             self._resolve(session, message.strip())
             return
-        if session.state == DialogState.COLLECTING_DATA and self._collect_list(session, message):
-            return
+        if session.state == DialogState.COLLECTING_DATA:
+            if self._collect_direct(session, message) or self._collect_list(session, message):
+                return
         response = self.interpreter.interpret(message, self._context(session))
         action = response["action"]
         if action == "cancel":
             self.cancel(session)
-        elif action in {"question", "unclear"}:
-            self._clarify(session, response["reply"])
+        elif action == "unclear":
+            self._clarify(session, "")
+        elif action == "question":
+            current = self._missing(session, self.registry.get(session.template_id))
+            reply = current.validation_hint if session.state == DialogState.COLLECTING_DATA and current else response["reply"]
+            self._clarify(session, reply)
         elif session.state == DialogState.TEMPLATE_SUGGESTED:
             self._answer_suggestion(session, action)
         elif session.state == DialogState.REVIEW and action == "confirm":
@@ -42,9 +48,9 @@ class DialogManager:
         elif session.state == DialogState.REVIEW and action == "reject":
             session.message = "Укажи, какое поле нужно исправить, и его новое значение."
         elif action == "data":
-            self._collect(session, message, response.get("value"), response["reply"])
+            self._collect(session, message, response.get("value"))
         else:
-            self._clarify(session, response["reply"])
+            self._clarify(session, "")
 
     def revise(self, session: DialogSession, message: str) -> None:
         """Применяет правки к полям ранее созданного документа."""
@@ -59,7 +65,9 @@ class DialogManager:
         """Отвечает и возвращает пользователя к текущему шагу."""
         template = self.registry.get(session.template_id)
         current = self._missing(session, template)
-        prompt = current.question if session.state == DialogState.COLLECTING_DATA and current else ""
+        prompt = self._question(template, current) if session.state == DialogState.COLLECTING_DATA and current else ""
+        if prompt and not reply:
+            reply = f"Уточни, пожалуйста, поле «{current.caption}»."
         if prompt and prompt.casefold() in reply.casefold():
             prompt = ""
         session.message = "\n".join(filter(None, (reply.strip(), prompt))) or "Уточни, пожалуйста, свой ответ."
@@ -73,7 +81,7 @@ class DialogManager:
         if session.state == DialogState.TEMPLATE_SUGGESTED:
             return context + "Ожидается согласие заполнить предложенный документ."
         if current:
-            return context + f"Текущее поле: {current.caption}. Вопрос: {current.question}"
+            return context + f"Текущее поле: {current.caption}. Вопрос: {current.question or current.caption}"
         return context + "Данные показаны для проверки. Ожидается подтверждение создания или исправления."
 
     def _resolve(self, session: DialogSession, message: str) -> None:
@@ -166,14 +174,39 @@ class DialogManager:
         self._save_updates(session, template, extracted, "")
         return True
 
-    def _collect(self, session: DialogSession, message: str, value: object, reply: str) -> None:
+    def _collect_direct(self, session: DialogSession, message: str) -> bool:
+        """Сохраняет однозначный ответ без обращения к модели."""
+        template = self.registry.get(session.template_id)
+        current = self._missing(session, template)
+        if not current:
+            return False
+        text = message.strip().rstrip(".!").rstrip()
+        if current.type == "integer":
+            if not re.fullmatch(r"[+-]?[0-9]+", FieldValidator.integer_text(current, text)):
+                return False
+        elif current.key == "study_form":
+            form = FieldValidator.study_form(text)
+            if form is None:
+                return False
+            text = form
+        elif current.type in {"choice", "enum", "date", "boolean"}:
+            try:
+                FieldValidator.validate(current, text)
+            except FieldError:
+                return False
+        else:
+            return False
+        self._save_updates(session, template, {current.key: text}, "")
+        return True
+
+    def _collect(self, session: DialogSession, message: str, value: object) -> None:
         """Сохраняет проверенные значения из одного сообщения."""
         template = self.registry.get(session.template_id)
         current = self._missing(session, template)
         extracted = self.extractor.extract(template, message, current)
         if current and current.key not in extracted and self.extractor.is_quoted(value, message):
             extracted[current.key] = value
-        self._save_updates(session, template, extracted, reply)
+        self._save_updates(session, template, extracted, "")
 
     def _save_updates(self, session: DialogSession, template: DocumentTemplate, extracted: dict, reply: str) -> None:
         """Сохраняет значения и продолжает диалог."""
@@ -203,10 +236,25 @@ class DialogManager:
         current = self._missing(session, template)
         if current:
             session.state = DialogState.COLLECTING_DATA
-            session.message = current.question
+            session.message = self._question(template, current)
         else:
             session.state = DialogState.REVIEW
             session.message = self._review(session, template)
+
+    def _question(self, template: DocumentTemplate, field: TemplateField) -> str:
+        """Формулирует вопрос по названию поля."""
+        if field.question:
+            return field.question
+        schema = {"type": "object", "properties": {"question": {"type": "string"}}, "required": ["question"]}
+        try:
+            result = self.extractor.provider.request_json(
+                "Задай заявителю один короткий вопрос на русском языке, чтобы заполнить указанное поле.",
+                f"Документ: {template.title}. Поле: {field.caption}.", schema)
+            if isinstance(result.get("question"), str) and result["question"].strip():
+                return result["question"].strip()
+        except ProviderError:
+            pass
+        return f"Укажи значение поля «{field.caption}»."
 
     @staticmethod
     def _review(session: DialogSession, template: DocumentTemplate) -> str:
@@ -215,7 +263,9 @@ class DialogManager:
         for field in template.fields:
             value = session.values.get(field.key)
             shown = display_value(value) if value is not None else "не указано"
-            lines.append(f"{field.caption}: {shown}")
+            label = field.caption.replace("\\", "\\\\").replace("*", "\\*")
+            text = shown.replace("\\", "\\\\").replace("*", "\\*")
+            lines.append(f"**{label}**: {text}")
         lines.append("Подтверди создание DOCX или укажи, что нужно исправить.")
         return "\n".join(lines)
 

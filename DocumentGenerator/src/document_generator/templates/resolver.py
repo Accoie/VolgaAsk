@@ -6,19 +6,18 @@ from snowballstemmer import stemmer
 
 from ..errors import ProviderError
 from ..llm.base import BaseLLMProvider
-from .registry import TemplateRegistry
-from .schemas import DocumentTemplate
+from .schemas import TemplateChoice
 
 logger = logging.getLogger(__name__)
 
 
 class TemplateResolver:
-    def __init__(self, registry: TemplateRegistry, provider: BaseLLMProvider):
+    def __init__(self, registry, provider: BaseLLMProvider):
         """Подготавливает поиск по реестру."""
         self.registry = registry
         self.provider = provider
 
-    def resolve(self, message: str) -> list[DocumentTemplate]:
+    def resolve(self, message: str) -> list[TemplateChoice]:
         """Ищет подходящие шаблоны для запроса."""
         templates = self.registry.list_templates()
         if not templates or not message.strip():
@@ -38,7 +37,7 @@ class TemplateResolver:
         words = re.findall(r"\w+", text.casefold().replace("ё", "е"))
         return " " + " ".join(stem.stemWords(words)) + " "
 
-    def _ask_model(self, message: str, templates: list[DocumentTemplate]) -> list[DocumentTemplate]:
+    def _ask_model(self, message: str, templates: list[TemplateChoice]) -> list[TemplateChoice]:
         """Уточняет выбор среди известных документов."""
         catalog = [item.model_dump(include={"id", "title", "description", "aliases"}) for item in templates]
         ids = [item.id for item in templates]

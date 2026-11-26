@@ -6,10 +6,8 @@ def main() -> None:
     """Запускает диалог в терминале."""
     generator = DocumentGenerator()
     print("VolgaAsk Document Generator")
-    if generator.registry.unavailable:
-        print("Пропущены повреждённые шаблоны: " + ", ".join(generator.registry.unavailable))
     if not generator.registry.list_templates():
-        print("Нет доступных бланков. Проверь папку шаблонов.")
+        print("Нет опубликованных бланков. Открой раздел управления шаблонами.")
         return
     print("Какое заявление нужно оформить? Для выхода напиши «отмена».")
     try:
