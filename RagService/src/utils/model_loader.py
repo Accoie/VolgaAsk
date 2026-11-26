@@ -2,9 +2,7 @@ import logging
 from pathlib import Path
 from typing import Callable, TypeVar
 
-from docling_core.transforms.chunker.tokenizer.huggingface import HuggingFaceTokenizer
 from sentence_transformers import CrossEncoder, SentenceTransformer
-from transformers import AutoTokenizer
 
 from configs.config import PathsConfig
 
@@ -27,19 +25,6 @@ class ModelLoader:
             download_fn=lambda: SentenceTransformer(model_name, local_files_only=False),
             save_fn=lambda model: model.save_pretrained(str(local_path)),
         )
-
-    @staticmethod
-    def load_tokenizer(model_name: str, max_tokens: int) -> HuggingFaceTokenizer:
-        """Загрузить токенизатор локально или скачать его при отсутствии."""
-        local_path = ModelLoader._resolve_path(model_name)
-        tokenizer = ModelLoader._load_or_download(
-            local_path=local_path,
-            model_name=model_name,
-            load_local_fn=lambda: AutoTokenizer.from_pretrained(str(local_path), local_files_only=True),
-            download_fn=lambda: AutoTokenizer.from_pretrained(model_name, local_files_only=False),
-            save_fn=lambda tok: tok.save_pretrained(str(local_path)),
-        )
-        return HuggingFaceTokenizer(tokenizer=tokenizer, max_tokens=max_tokens)
 
     @staticmethod
     def load_cross_encoder(model_name: str) -> CrossEncoder:

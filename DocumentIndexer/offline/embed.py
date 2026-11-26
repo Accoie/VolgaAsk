@@ -3,9 +3,8 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from configs.config import ModelsConfig, PathsConfig
-from utils.model_loader import ModelLoader
-from processing.embedder import Embedder
+from encoder import Embedder, load_embedding_model
+from settings import ModelsConfig, PathsConfig
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +30,7 @@ def embed_all(input_dir: Path, output_dir: Path) -> bool:
 
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    embedding_model = ModelLoader.load_embedding_model(ModelsConfig.EMBEDDER)
+    embedding_model = load_embedding_model(ModelsConfig.EMBEDDER)
     embedder = Embedder(embedding_model)
 
     failed = False

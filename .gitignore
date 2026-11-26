@@ -1,6 +1,13 @@
 /.env
-/storage/
+/storage/*
+!/storage/kb/
+/storage/kb/*
+!/storage/kb/bootstrap/
+__pycache__/
 /Backend/bin/
 /Backend/obj/
 /Frontend/node_modules/
 /Frontend/dist/
+.idea/
+.vs/
+.vscode/

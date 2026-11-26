@@ -3,9 +3,11 @@ import re
 
 from docling_core.transforms.chunker.doc_chunk import DocChunk
 from docling_core.transforms.chunker.hybrid_chunker import HybridChunker
+from docling_core.transforms.chunker.tokenizer.huggingface import HuggingFaceTokenizer
 from docling_core.types.doc.document import DoclingDocument
+from transformers import AutoTokenizer
 
-from utils.model_loader import ModelLoader
+from encoder import load_model
 
 logger = logging.getLogger(__name__)
 
@@ -25,8 +27,9 @@ class Chunker:
         model_name: str,
         max_tokens: int = 256,
     ) -> None:
-        tokenizer = ModelLoader.load_tokenizer(model_name, max_tokens)
-        self.chunker = HybridChunker(tokenizer=tokenizer, merge_peers=True)
+        tokenizer = load_model(model_name, AutoTokenizer.from_pretrained, lambda model, path: model.save_pretrained(path))
+        self.chunker = HybridChunker(
+            tokenizer=HuggingFaceTokenizer(tokenizer=tokenizer, max_tokens=max_tokens), merge_peers=True)
 
 
     def chunk(

@@ -11,7 +11,6 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field, StringConstraints
 
 from configs.config import ModelsConfig
-from database.indexer import Indexer
 from database.session import create_db_engine
 from processing.generator import Generator
 from processing.retriever import Retriever
@@ -24,7 +23,6 @@ async def lifespan(app: FastAPI):
     """Подключает индекс и модели поиска."""
     engine = create_db_engine()
     try:
-        Indexer(engine).ensure_schema()
         app.state.search = Retriever(engine, ModelsConfig.EMBEDDER, ModelsConfig.RERANKER)
         app.state.generation = Generator(ollama.AsyncClient(), os.getenv("OLLAMA_MODEL", "qwen2.5:3b"))
         app.state.model_lock = asyncio.Lock()

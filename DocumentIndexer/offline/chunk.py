@@ -3,10 +3,10 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from configs.config import ModelsConfig, PathsConfig
-from processing.chunker import Chunker
-from processing.converter import Converter
-from utils.date_parser import DateParser
+from chunker import Chunker
+from converter import Converter
+from date_parser import DateParser
+from settings import ModelsConfig, PathsConfig
 
 logger = logging.getLogger(__name__)
 

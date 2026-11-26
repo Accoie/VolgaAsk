@@ -5,14 +5,12 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "rag-service"
 version = "0.1.0"
-description = "RAG-сервис Волгатеха: конвертация документов, чанкинг, эмбеддинги и поиск"
+description = "Поиск по индексу и генерация ответов Волгатеха"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.115,<1",
     "uvicorn>=0.30,<1",
     "ollama>=0.4,<1",
-    "docling>=2.0",
-    "docling-core>=2.0",
     "pgvector>=0.2",
     "psycopg[binary]>=3.1",
     "sentence-transformers>=3.0",

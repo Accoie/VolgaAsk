@@ -5,7 +5,7 @@ from sqlalchemy import text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
-from .models import Base, Chunk
+from chunk_model import Base, Chunk
 
 
 class Indexer:

@@ -1,10 +1,10 @@
 import logging
 
-from configs.config import PathsConfig
-from database.session import create_db_engine
-from scripts.chunk import chunk_directory
-from scripts.embed import embed_all
-from scripts.index import index_directory
+from db import create_db_engine
+from offline.chunk import chunk_directory
+from offline.embed import embed_all
+from offline.index import index_directory
+from settings import PathsConfig
 
 
 logger = logging.getLogger(__name__)
